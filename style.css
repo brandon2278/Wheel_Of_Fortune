@@ -1,0 +1,112 @@
+
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  background-color: rgb(216, 228, 231);
+  padding: 1rem;
+  margin: 1rem;
+}
+.wrapper{
+  position: absolute;
+  top: 30px;
+  margin-left: 100px;
+  padding: 10px;
+}
+.wrapper div button{
+  position: relative;
+}
+.solver form {
+  max-width: 300px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 1rem;
+}
+.butn {
+  background-color: grey;
+  padding: 0.5rem;
+  margin: 1.75rem;
+  border: none;
+}
+.container button {
+  display: flex;
+  flex-direction: row;
+}
+.the_wheel {
+  display: block;
+  z-index: -10;
+  background-image: url(wheel_back.png);
+  background-position: center;
+  background-repeat: none;
+  transform: scale(0.7);
+
+}
+.power_controls img{
+  margin-top: -20px;
+}
+
+/* Do some css reset on selected elements */
+h1,
+p {
+  margin: 0;
+}
+
+
+
+div.html5_logo {
+  margin-left: 70px;
+}
+
+/* Styles for the power selection controls */
+table.power {
+  background-color: #cccccc;
+  cursor: pointer;
+  border: 1px solid #333333;
+}
+
+table.power th {
+  background-color: white;
+  cursor: default;
+}
+
+td.pw2 {
+  background-color: #86ef6f;
+}
+
+/* Style applied to the spin button once a power has been selected */
+.clickable {
+  cursor: pointer;
+}
+.canvas {
+  position: absolute;
+  margin-top: 49.5px;
+  padding: 17px;
+  z-index: 1;
+  
+}
+.title{
+  margin-top: 1rem;
+  position: relative;
+  color: white;
+  z-index: 100;
+}
+tr.container {
+  background-color: grey;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-top: -50px;
+  max-width: 450px;
+  
+}
+.score h5{
+  font-size: 1.8rem;
+}
+
+@media(max-width: 400px) {
+  table.wheelContainer{
+    width: 350px;
+  }
+}
