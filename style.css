@@ -1,11 +1,34 @@
-
+@font-face {
+  font-family: 'Fortune';
+  src: url('fonts/fortune-font.ttf') format('truetype');
+}
 * {
   margin: 0;
   padding: 0;
 }
 body {
   background-color: rgb(216, 228, 231);
+  background-image: url(wallpapers/background.png);
+  background-size: cover; 
   padding: 1rem;
+  margin: 1rem;
+  height: 100%;
+  width: 100%;
+  font-family: 'Fortune';
+  margin: 0 auto; 
+  color:  rgb(255, 223, 79);
+}
+.index{
+  background-image: url(wallpapers/background.png);
+  background-size: cover; 
+  letter-spacing: 2px;
+  max-width: 1400px;
+}
+/* .container{
+  background-color: rgba(255, 255, 255, 0.76);
+  padding: 2rem;
+} */
+.list-unstyled li{
   margin: 1rem;
 }
 .wrapper{
@@ -24,24 +47,18 @@ body {
   flex-direction: column;
   margin: 1rem;
 }
-.butn {
-  background-color: grey;
-  padding: 0.5rem;
-  margin: 1.75rem;
-  border: none;
-}
-.container button {
+
+.container1 button {
   display: flex;
   flex-direction: row;
 }
 .the_wheel {
   display: block;
   z-index: -10;
-  background-image: url(wheel_back.png);
+  background-image: url(wallpapers/wheel_back.png);
   background-position: center;
   background-repeat: none;
-  transform: scale(0.7);
-
+  transform: scale(0.95);
 }
 .power_controls img{
   margin-top: -20px;
@@ -92,13 +109,10 @@ td.pw2 {
   color: white;
   z-index: 100;
 }
-tr.container {
-  background-color: grey;
+tr.container1 {
   display: flex;
   flex-direction: column;
   position: relative;
-  margin-top: -50px;
-  max-width: 450px;
   
 }
 .score h5{
@@ -110,3 +124,79 @@ tr.container {
     width: 350px;
   }
 }
+
+.home-screen{
+  background-color: rgba(243, 243, 243, 0.363);
+  padding: 1rem;
+}
+
+/* Modal */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-image: url(wallpapers/home-background.jpg);
+  background-size: cover;
+  background-position: center;
+  margin: 10% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+  max-height: 600px;
+}
+.modal-content1 {
+  background-color:rgba(255, 223, 79, 0.8); 
+  margin: 10% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+  max-height: 600px;
+}
+/* Error messages */
+@keyframes animate1 {
+  0% {
+    top: -270px;
+  }
+  10% {
+    top: -20px;
+  }
+  25% {
+    top: 0;
+  }
+  50% {
+    top: 0;
+  }
+  90% {
+    top: 0;
+  }
+  100% {
+    top: -270px;
+  }
+}
+.error {
+  animation-name: animate1;
+  transition: ease;
+  animation-duration: 3s;
+  color: rgb(0, 0, 0);
+  font-size: 1rem;
+  padding: 0.5rem;
+  margin-top: 15px;
+  border-radius: 0.25rem;
+  position: absolute;
+  top: -270px;
+  z-index: 100000000;
+  background-color: rgba(255, 223, 79);
+}
+
+
