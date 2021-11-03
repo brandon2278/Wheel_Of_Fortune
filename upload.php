@@ -16,7 +16,7 @@ session_start();
     <script src='./Winwheel.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
     <link rel="stylesheet" href="style.css">
-    <title>Wheel of Fortune</title> 
+    <title>Upload</title> 
 </head>
 
 

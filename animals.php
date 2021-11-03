@@ -286,13 +286,20 @@ if ($conn->connect_error) {
                                 transparent 0,
                                 transparent 1.5ch) 0 100%/<?php echo $lineLength; ?>ch 2px no-repeat;
                         color: dimgrey;
-                        font: 5ch consolas, monospace;
+                        font: 5ch consolas, serif;
                         letter-spacing: .5ch;
                     }
 
                     .input:focus {
                         outline: none;
                         color: dodgerblue;
+                    }
+
+                    .input-back {
+                        background-color: rgb(255, 193, 7);
+                        ;
+                        padding: 10px;
+                        width: <?php echo $lineLength * 30; ?>px;
                     }
                 </style>
 
@@ -301,11 +308,16 @@ if ($conn->connect_error) {
                         <label for="word">
                             <h2>Mi'Kmaw Word</h2>
                         </label>
-                        <center><input class="input" maxlength='<?php echo $wordLength; ?>' type="text" name="mWord" </center>
-                            <input type="hidden" name="ID" value="<?php echo $num; ?>" />
-                            <input type="hidden" id="tempScore" name="tempScore" value="" />
-                            <input type="hidden" id="usrScore" name="usrScore" value="" />
-                            <center><input id="subm" value="SOLVE" class="btn btn-warning" type="submit" style="margin: 20px;"></center>
+                        <center>
+                            <div class="input-back">
+                                <input class="input" maxlength='<?php echo $wordLength; ?>' type="text" name="mWord">
+                                <input type="hidden" name="ID" value="<?php echo $num; ?>" />
+                                <input type="hidden" id="tempScore" name="tempScore" value="" />
+                                <input type="hidden" id="usrScore" name="usrScore" value="" />
+                            </div>
+                        </center>
+                        <center><input id="subm" value="SOLVE" class="btn btn-warning" type="submit" style="margin: 20px;"></center>
+
                     </form>
                 </div>
                 <script>
@@ -324,10 +336,7 @@ if ($conn->connect_error) {
 
 
             </div>
-
-
-
-
+            
         </div>
     </center>
 

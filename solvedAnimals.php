@@ -33,9 +33,10 @@ session_start();
 
 
             <div>
-
+                
                 <button style="margin: 20px;" class="btn btn-warning" onclick="location.href = 'animals.php';">Next</button>
                 <?php
+                
 
                 require 'includes/db.php';
                 // Create connection
@@ -61,7 +62,7 @@ session_start();
                     while ($row = $result->fetch_assoc()) {
                         if (strcasecmp($row["word"], $usrWord) == 0) {
 
-                            echo "<h3>Congratulations</h3> <h4>The Correct Word is: " . $row["word"] . "</h4>";
+                            echo "<h3>Congratulations</h3> <h4>The Correct Word was: " . $row["word"] . "</h4>";
                 ?>
                             <script>
                                 var tempScore = localStorage.getItem('tempScore');

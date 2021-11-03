@@ -61,6 +61,7 @@ session_start();
                     </form>';
             if (isset($_SESSION['Id']) ==  1) {
                 echo '<div style="margin: 15px;" align="center"><a href="upload.php" class="btn btn-warning" type="submit"><i class="fas fa-upload"></i> Add New Words</a></div>';
+//echo '<div style="margin: 15px;" align="center"><a href="delete.php" class="btn btn-warning" type="submit"><i class="fas fa-trash-alt"></i> Delete Words</a></div>';
             }
             echo "
                     <style>
