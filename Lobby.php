@@ -48,9 +48,9 @@
 			</div>
 
 			<div id = "control-container" align = "center">	
-				<button onclick="readyUp()" style="font-size: 2em;">Ready Up</button>
-				<button onclick="forceStart()" style = "display: none; font-size: 2em;" id="force-start">Force Start</button>
-				<button onclick="leaveRoom()" style="font-size: 2em">Leave Room</button>
+				<button onclick="readyUp()" class="btn btn-dark" style="font-size: 2em;">Ready Up</button>
+				<button onclick="forceStart()" class="btn btn-dark" style = "display: none; font-size: 2em;" id="force-start">Force Start</button>
+				<button onclick="leaveRoom()" class="btn btn-dark" style="font-size: 2em">Leave Room</button>
 			</div>
 		</div>
 

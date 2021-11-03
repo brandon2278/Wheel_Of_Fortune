@@ -39,6 +39,7 @@ function displayRooms() {
 	
 	var menuButton = document.createElement("button");
 	menuButton.innerHTML = "Back";
+	menuButton.className = "btn btn-dark";
 	menuButton.onclick = () => { document.location.href = 'Menu.php'; }
 	menuButton.style.fontSize = "2em";
 	body.appendChild(menuButton);
@@ -50,6 +51,7 @@ function displayRooms() {
 	
 	var createLobbyButton = document.createElement("button");
 	createLobbyButton.innerHTML = "Create Lobby";
+	createLobbyButton.className = "btn btn-dark";
 	createLobbyButton.onclick = () => {
 		makingLobby = true;
 		textbox.style.visibility = "visible";
