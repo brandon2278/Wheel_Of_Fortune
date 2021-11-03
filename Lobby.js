@@ -63,7 +63,8 @@ function displayUsers() {
 		if (user.user.isLeader) aElement.style.color = "yellow";
 		else if(user.user.isReady) aElement.style.color = "#22FF22";
 		aElement.className = "btn btn-dark";
-		aElement.setAttribute("role", "button"); 
+		aElement.setAttribute("role", "button");
+		aElement.style.fontSize = "2em";
 		aElement.innerHTML = user.user.Name;
 		lobbyElement.appendChild(aElement);
 		lobbyContainer.appendChild(lobbyElement);
