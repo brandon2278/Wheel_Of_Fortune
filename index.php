@@ -62,6 +62,7 @@ session_start();
             if (isset($_SESSION['Id']) ==  1) {
                 echo '<div style="margin: 15px;" align="center"><a href="upload.php" class="btn btn-warning" type="submit"><i class="fas fa-upload"></i> Add New Words</a></div>';
 //echo '<div style="margin: 15px;" align="center"><a href="delete.php" class="btn btn-warning" type="submit"><i class="fas fa-trash-alt"></i> Delete Words</a></div>';
+		echo '<script>location.href = "Menu.php"</script>';
             }
             echo "
                     <style>
@@ -119,23 +120,6 @@ session_start();
                 </div>";
         }
         ?>
-        <div class="home-screen">
-            <div align="center">
-                <h2>Choose a Category</h2>
-                <ul class="list-unstyled">
-
-                    <li><a class="btn btn-dark" href="animals.php" role="button"> Animals </a></li>
-                    <li><a class="btn btn-dark" href="#" role="button"> Greetings </a></li>
-                    <li><a class="btn btn-dark" href="#" role="button"> Phrases </a></li>
-                    <li><a class="btn btn-dark" href="#" role="button"> Food </a></li>
-                    <li><a class="btn btn-dark" href="#" role="button"> Earth </a></li>
-                    <li><a class="btn btn-dark" href="#" role="button"> Calendar </a></li>
-                    <li><a class="btn btn-dark" href="#" role="button"> Numbers </a></li>
-                </ul>
-            </div>
-        </div>
-
-
     </section>
 
 

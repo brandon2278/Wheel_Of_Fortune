@@ -1,3 +1,15 @@
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+
+.break {
+  flex-basis: 100%;
+  height: 0;
+}
+
 @font-face {
   font-family: 'Fortune';
   src: url('fonts/fortune-font.ttf') format('truetype');
@@ -199,4 +211,160 @@ tr.container1 {
   background-color: rgba(255, 223, 79);
 }
 
+/* Defines a keybard with speical Mi'kmaq characters */
+.mikmaqKeyboard {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100;
+	padding: 5px 0;
+	box-shadow 0 0 50px rgba(0, 0, 0, 0.5);
+	background-color: grey;
+	user-select: none;
+	transition: bottom 0.4s;
+}
 
+/* Define the Mi'kmaq keyboard in the hidden state */
+.mikmaqKeyboard--hidden {
+	bottom: -100%;
+}
+
+/* Defines the set of keys in the keybaord */
+.mikmaqKeyboardKeys {
+	text-align: center;
+}
+
+/* Defines and individual key on the keyboard */
+.mikmaqKeyboardKey {
+	width: 6%;
+	max-width: 90px;
+	height: 50px;
+	margin: 3px;
+	border-radius: 4px;
+	border: none;
+	font-size: 1.05em;
+	background: rgba(255, 255, 255, 0.2);
+	color: white;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	outline: none;
+	cursor: pointer;
+	vertical-align: top;
+	padding: 0;
+	position: relative;
+}
+
+/* Defines a key as it's beeing pressed */
+.mikmaqKeyboardKey:active {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+/* Defines a wider version of a key */
+.mikmaqKeyboardKey--wide {
+	width: 12%;		
+}
+
+/* Defines a even wider version of a key */
+.mikmaqKeyboardKey--extraWide {
+	width: 36%;
+	max-width: 300px;	
+}
+
+/* Defines a activatable key */
+.mikmaqKeyboardKey--activatable::after {
+	content: '';
+	top: 10px;
+	right: 10px;
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background: rgba(0, 0, 0, 0.4);
+	border-radius: 50%;
+}
+/* Define a Active Keybaord */
+.mikmaqKeyboardKey--active::after {
+	background: #08ff00;
+}
+
+/* Defines  Lobby Page*/
+#lobby-content {
+	background-color: rgba(0,0,0,0.4);
+	width: 80%;
+	height: 80%;
+	display: flex;
+	margin: auto;
+}
+
+#user-list-container {
+	width: 20%;
+	height: 100%;
+	display: block;
+}
+
+#middle-container {
+	width: 60%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
+#chat-container {
+	width: 100%;
+	height: 50%;
+}
+#chat-window {
+	background-color: rgba(255,255,255,0.4);
+	align-items: center;
+	height: 90%;
+	width: 100%;
+	overflow-y: scroll;
+	display: flex;
+	flex-direction: column-reverse;
+	align-items: flex-start;
+	padding-left: 10px;
+}
+
+#message-box {
+	width: 100%;
+	height: 10%;
+}
+
+#game-info-container {
+	width: 20%;
+	height: 100%;
+	display: block;
+}
+
+#control-container {
+	width: 100%;
+	height: 20%;
+
+}
+
+#lobby-view-container {
+	background-color: rgba(0, 0, 0, 0.4);
+	height: 80%;
+	width: 80%;
+	overflow-y: scroll;
+	display: flex;
+	margin: auto;
+}
+
+#lobby-table {
+	width: 100%;
+	height: 100%;
+	font-size: 2em;
+	margin: 20px;
+}
+
+#lobby-table tr {
+	height: 100px;
+	vertical-align: top;
+}
+
+#lobby-table td {
+	height: 100px;
+	vertical-align: top;
+}
