@@ -1,11 +1,46 @@
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+}
 
+.break {
+  flex-basis: 100%;
+  height: 0;
+}
+
+@font-face {
+  font-family: 'Fortune';
+  src: url('fonts/fortune-font.ttf') format('truetype');
+}
 * {
   margin: 0;
   padding: 0;
 }
 body {
   background-color: rgb(216, 228, 231);
+  background-image: url(wallpapers/background.png);
+  background-size: cover; 
   padding: 1rem;
+  margin: 1rem;
+  height: 100%;
+  width: 100%;
+  font-family: 'Fortune';
+  margin: 0 auto; 
+  color:  rgb(255, 223, 79);
+}
+.index{
+  background-image: url(wallpapers/background.png);
+  background-size: cover; 
+  letter-spacing: 2px;
+  max-width: 1400px;
+}
+/* .container{
+  background-color: rgba(255, 255, 255, 0.76);
+  padding: 2rem;
+} */
+.list-unstyled li{
   margin: 1rem;
 }
 .wrapper{
@@ -18,30 +53,24 @@ body {
   position: relative;
 }
 .solver form {
-  max-width: 300px;
+  max-width: 700px;
   position: relative;
   display: flex;
   flex-direction: column;
   margin: 1rem;
 }
-.butn {
-  background-color: grey;
-  padding: 0.5rem;
-  margin: 1.75rem;
-  border: none;
-}
-.container button {
+
+.container1 button {
   display: flex;
   flex-direction: row;
 }
 .the_wheel {
   display: block;
   z-index: -10;
-  background-image: url(wheel_back.png);
+  background-image: url(wallpapers/wheel_back.png);
   background-position: center;
   background-repeat: none;
-  transform: scale(0.7);
-
+  transform: scale(0.95);
 }
 .power_controls img{
   margin-top: -20px;
@@ -52,7 +81,14 @@ h1,
 p {
   margin: 0;
 }
-
+#subm{
+  position: relative;
+  transform: translateY(80px);
+}
+#quit{
+  position: relative;
+  transform: translateY(60px);
+}
 
 
 div.html5_logo {
@@ -92,13 +128,10 @@ td.pw2 {
   color: white;
   z-index: 100;
 }
-tr.container {
-  background-color: grey;
+tr.container1 {
   display: flex;
   flex-direction: column;
   position: relative;
-  margin-top: -50px;
-  max-width: 450px;
   
 }
 .score h5{
@@ -109,4 +142,341 @@ tr.container {
   table.wheelContainer{
     width: 350px;
   }
+}
+
+.home-screen{
+  background-color: rgba(243, 243, 243, 0.363);
+  padding: 1rem;
+}
+
+/* Modal */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Translator /Box */
+.translater {
+  background-color:rgba(72, 21, 131, 0.9); 
+  margin: 10% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 60%;
+  max-height: 600px;
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  margin-top: -10px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+/* Modal Content/Box */
+.modal-content {
+  background-image: url(wallpapers/home-background.jpg);
+  background-size: cover;
+  background-position: center;
+  margin: 10% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+  max-height: 600px;
+}
+.modal-content1 {
+  background-color:rgba(255, 223, 79, 0.8); 
+  margin: 10% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+  max-height: 600px;
+}
+/* Error messages */
+@keyframes animate1 {
+  0% {
+    top: -270px;
+  }
+  10% {
+    top: -20px;
+  }
+  25% {
+    top: 0;
+  }
+  50% {
+    top: 0;
+  }
+  90% {
+    top: 0;
+  }
+  100% {
+    top: -270px;
+  }
+}
+.error {
+  animation-name: animate1;
+  transition: ease;
+  animation-duration: 3s;
+  color: rgb(0, 0, 0);
+  font-size: 1rem;
+  padding: 0.5rem;
+  margin-top: 15px;
+  border-radius: 0.25rem;
+  position: absolute;
+  top: -270px;
+  z-index: 100000000;
+  background-color: rgba(255, 223, 79);
+}
+
+/* Defines a keybard with speical Mi'kmaq characters */
+.mikmaqKeyboard {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100;
+	padding: 5px 0;
+	box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+	background-color: grey;
+	user-select: none;
+	transition: bottom 0.4s;
+}
+
+/* Define the Mi'kmaq keyboard in the hidden state */
+.mikmaqKeyboard--hidden {
+	bottom: -100%;
+}
+
+/* Defines the set of keys in the keybaord */
+.mikmaqKeyboardKeys {
+	text-align: center;
+}
+
+/* Defines and individual key on the keyboard */
+.mikmaqKeyboardKey {
+	width: 6%;
+	max-width: 90px;
+	height: 50px;
+	margin: 3px;
+	border-radius: 4px;
+	border: none;
+	font-size: 1.05em;
+	background: rgba(255, 255, 255, 0.2);
+	color: white;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	outline: none;
+	cursor: pointer;
+	vertical-align: top;
+	padding: 0;
+	position: relative;
+}
+
+/* Defines a key as it's beeing pressed */
+.mikmaqKeyboardKey:active {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+/* Defines a wider version of a key */
+.mikmaqKeyboardKey--wide {
+	width: 12%;		
+}
+
+/* Defines a even wider version of a key */
+.mikmaqKeyboardKey--extraWide {
+	width: 36%;
+	max-width: 300px;	
+}
+
+/* Defines a activatable key */
+.mikmaqKeyboardKey--activatable::after {
+	content: '';
+	top: 10px;
+	right: 10px;
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background: rgba(0, 0, 0, 0.4);
+	border-radius: 50%;
+}
+/* Define a Active Keybaord */
+.mikmaqKeyboardKey--active::after {
+	background: #08ff00;
+}
+
+/* Defines  Lobby Page*/
+#lobby-content {
+	background-color: rgba(0,0,0,0.4);
+	width: 80%;
+	height: 80%;
+	display: flex;
+	margin: auto;
+}
+
+#user-list-container {
+	width: 20%;
+	height: 100%;
+	display: block;
+}
+
+#middle-container {
+	width: 60%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
+#chat-container {
+	width: 100%;
+	height: 50%;
+}
+#chat-window {
+	background-color: rgba(255,255,255,0.4);
+	align-items: center;
+	height: 90%;
+	width: 100%;
+	overflow-y: scroll;
+	display: flex;
+	flex-direction: column-reverse;
+	align-items: flex-start;
+	padding-left: 10px;
+}
+
+#message-box {
+	width: 100%;
+	height: 10%;
+}
+
+#game-info-container {
+	width: 20%;
+	height: 100%;
+	display: block;
+}
+
+#control-container {
+	width: 100%;
+	height: 20%;
+
+}
+
+#lobby-view-container {
+	background-color: rgba(0, 0, 0, 0.4);
+	height: 80%;
+	width: 80%;
+	overflow-y: scroll;
+	display: flex;
+	margin: auto;
+}
+
+#lobby-table {
+	width: 100%;
+	height: 100%;
+	font-size: 2em;
+	margin: 20px;
+}
+
+#lobby-table tr {
+	height: 100px;
+	vertical-align: top;
+}
+
+#lobby-table td {
+	height: 100px;
+	vertical-align: top;
+}
+
+
+
+/* Phrases Section */
+.puzzle-section {
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  height: 250px;
+  justify-content: center;
+  position: relative;
+}
+
+.puzzle-grid {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  height: 225px;
+  width: calc(600px + 6%);
+}
+
+.letter-container {
+  align-items: center;
+  background-color: #1c7455;
+  border: 2px solid rgba(0, 0, 0, 0.8);
+  display: flex;
+  font-size: 2.5rem;
+  height: 56px;
+  justify-content: center;
+  padding-top: 5px;
+}
+
+.letter-container:hover {
+  cursor: default;
+}
+
+.keyboard-section {
+  position: relative;
+  display: grid;
+  font-size: 1.5rem;
+  grid-template-columns: repeat(13, 1fr);
+  height: 100px;
+  margin: 20px auto;
+  width: 65%;
+}
+
+.keyboard-letters {
+  align-items: center;
+  background: linear-gradient(#17b4e3, #277cc9);
+  border: 2px solid #246ab2;
+  border-left-width: 0;
+  border-radius: 50px;
+  border-right-width: 0;
+  border-top: none;
+  box-shadow: 0px 3px 11px 0 rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  margin: 2px;
+  padding-top: 5px; 
+  position: relative;
+  text-shadow: 0 1px 1px rgba(50, 50, 50, .5);
+  width: 95%;
+}
+
+.keyboard-letters:hover {
+  background: #17b4e3;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.vowel {
+  background: #1B5999;
+  cursor: default;
+}
+
+.disabled,
+.temp-disabled,
+.vowel-disabled {
+  background: #1B5999;
+  cursor: default;
 }
