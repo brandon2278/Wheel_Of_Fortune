@@ -40,7 +40,7 @@ function displayRooms() {
 	var menuButton = document.createElement("button");
 	menuButton.innerHTML = "Back";
 	menuButton.className = "btn btn-dark";
-	menuButton.onclick = () => { document.location.href = 'Menu.php'; }
+	menuButton.onclick = () => { document.location.href = 'Index.php'; }
 	menuButton.style.fontSize = "2em";
 	body.appendChild(menuButton);
 
