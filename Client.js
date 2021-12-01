@@ -1,4 +1,4 @@
-let ws = new WebSocket("wss://ddmo.xyz:8169");
+let ws = new WebSocket("ws://127.0.0.1:8010");
 
 var user = {
 	"Name": "Tester",
@@ -11,6 +11,83 @@ var user = {
 var roomList;
 
 var makingLobby = false;
+
+var currentRoom = null;
+const RID = document.location.href.split("=")[1];
+
+var serverCallbacks = new EventTarget(); 
+
+serverCallbacks.addEventListener("updateRoomList", (e) => {
+	const data = e.detail;
+	roomList = data.roomList;
+	if (!makingLobby) displayRooms();
+});
+
+serverCallbacks.addEventListener("updateRoom", (e) => {
+	console.log("Updating Room")
+	const data = e.detail;
+	updateRoom(data);
+});
+
+function displayMessages(id) {
+	var chatWindow = document.getElementById(id);
+	chatWindow.innerHTML = "";
+	if(currentRoom.messages !== undefined) {
+		currentRoom.messages.reverse().forEach(m => {
+			var messageElement = document.createElement("p");
+			messageElement.innerHTML = m.userName + ": " + m.message;
+			chatWindow.appendChild(messageElement);
+		});
+	}
+}
+
+function sendMessage(text) {
+	const packet = {
+		"requestType": "sendMessage",
+		"message": text,
+		"user": user,
+		"RID": RID
+	}
+	ws.send(JSON.stringify(packet));
+}
+
+async function countdown(time, message) {
+	return await new Promise((res, rej) => {
+		swal({
+			title: 3,
+			timer: time,
+			buttons: false
+		}).then(() => {
+			swal({
+				title: 2,
+				timer: time,
+				buttons: false
+			}).then(() => {
+				swal({
+					title: 1,
+					timer: time,
+					buttons: false
+				}).then(() => {
+					swal({
+						title: message,
+						timer: time,
+						buttons: false
+					}).then(res());
+				})
+			})
+		})
+	});
+}
+
+function leaveRoom() {
+	const packet = {
+		"requestType": "exitRoom",
+		"RID": RID,
+		"user": user
+	}
+	ws.send(JSON.stringify(packet));
+	document.location.href = "SelectLobby.php";
+}
 
 function joinRoom(RID) {
 	const packet = {
@@ -34,7 +111,7 @@ function createRoom(roomName) {
 }
 
 function displayRooms() {
-	var body = document.getElementsByTagName("body")[0];
+	var body = document.getElementById("lobby");
 	body.innerHTML = "";
 	
 	var menuButton = document.createElement("button");
@@ -44,32 +121,14 @@ function displayRooms() {
 	menuButton.style.fontSize = "2em";
 	body.appendChild(menuButton);
 
-	var textbox = document.createElement("input");
-	textbox.id = "lobby-name-input";
-	textbox.style.visibility = "hidden";
-	body.appendChild(textbox);
-	
 	var createLobbyButton = document.createElement("button");
 	createLobbyButton.innerHTML = "Create Lobby";
 	createLobbyButton.className = "btn btn-dark";
 	createLobbyButton.onclick = () => {
 		makingLobby = true;
-		textbox.style.visibility = "visible";
-		textbox.addEventListener("keydown", (e) => {
+		createLobby.style.visibility = "visible";
+		createLobby.addEventListener("keydown", (e) => {
 			if(makingLobby) {
-				if(e.key === "Enter" && e.target.value === "") {
-					makingLobby = false;
-					textbox.style.visibility = "hidden";
-					textbox.removeEventListener("keydown", this,false)
-				}
-				else if (e.key === "Enter") {
-					makingLobby = false;
-					createRoom(e.target.value);
-					e.target.value = "";
-					textbox.style.visibility = "hidden";
-					textbox.removeEventListener("keydown", this,false)
-
-				}
 			}
 		});
 	}
@@ -123,8 +182,8 @@ function displayRooms() {
 
 		var leader = null;
 		roomList[key].userList.forEach(u => {
-			if(u.user.isLeader) {
-				leader = u.user.Name;
+			if(u.isLeader) {
+				leader = u.Name;
 			}
 		});
 
@@ -144,13 +203,6 @@ function displayRooms() {
 
 }
 
-var serverCallbacks = new EventTarget(); 
-
-serverCallbacks.addEventListener("updateRoomList", (e) => {
-	const data = e.detail;
-	roomList = data.roomList;
-	if (!makingLobby) displayRooms();
-});
 
 ws.onmessage = (e) => {
 	const data = JSON.parse(e.data);

@@ -1,6 +1,3 @@
-var currentRoom;
-const RID = document.location.href.split("=")[1];
-
 let messageBox;
 window.onload = () => {
 	messageBox = document.getElementById("message-box");
@@ -21,15 +18,26 @@ serverCallbacks.addEventListener("getRoom", (e) => {
 });
 
 
-serverCallbacks.addEventListener("updateRoom", (e) => {
-	console.log("Updating Room")
+
+serverCallbacks.addEventListener("startGame", (e) => {
 	const data = e.detail;
 	updateRoom(data);
+	startGame();
+
+});
+
+serverCallbacks.addEventListener("startCountdown", async (e) => {
+	await countdown(1000, "Starting!!!");
+	const packet = {
+		"requestType": "startGame",
+		"RID": RID
+	}
+	ws.send(JSON.stringify(packet));
 });
 
 function updateRoom(data) {
-	var me = data.room.userList.find(u => u.user.UID === user.UID);
-	if (me.user.isLeader) {
+	var me = data.room.userList.find(u => u.UID === user.UID);
+	if (me.isLeader) {
 		user.isLeader = true;
 		var forceStart = document.getElementById("force-start");
 		forceStart.style.display = "initial";
@@ -39,18 +47,8 @@ function updateRoom(data) {
 	var playerCount = document.getElementById("player-count");
 	playerCount.innerHTML = "Player Count: " + currentRoom.userList.length + "/10";
 
-	displayMessages();
+	displayMessages("chat-window");
 	displayUsers();
-}
-
-function leaveRoom() {
-	const packet = {
-		"requestType": "exitRoom",
-		"RID": RID,
-		"user": user
-	}
-	ws.send(JSON.stringify(packet));
-	document.location.href = "SelectLobby.php";
 }
 
 function displayUsers() {
@@ -60,48 +58,58 @@ function displayUsers() {
 	for(const user of currentRoom.userList) {
 		var lobbyElement = document.createElement("li");
 		var aElement = document.createElement("a");
-		if (user.user.isLeader) aElement.style.color = "yellow";
-		else if(user.user.isReady) aElement.style.color = "#22FF22";
+		if (user.isLeader) aElement.style.color = "yellow";
+		else if(user.isReady) aElement.style.color = "#22FF22";
 		aElement.className = "btn btn-dark";
 		aElement.setAttribute("role", "button");
 		aElement.style.fontSize = "2em";
-		aElement.innerHTML = user.user.Name;
+		aElement.innerHTML = user.Name;
 		lobbyElement.appendChild(aElement);
 		lobbyContainer.appendChild(lobbyElement);
 	}
 }
 
-
-function sendMessage(text) {
-	const packet = {
-		"requestType": "sendMessage",
-		"message": text,
-		"user": user,
-		"RID": RID
-	}
-	ws.send(JSON.stringify(packet));
-}
-
-function displayMessages() {
-	var chatWindow = document.getElementById("chat-window");
-	chatWindow.innerHTML = "";
-	if(currentRoom.messages !== undefined) {
-		currentRoom.messages.reverse().forEach(m => {
-			var messageElement = document.createElement("p");
-			messageElement.innerHTML = m.userName + ": " + m.message;
-			chatWindow.appendChild(messageElement);
-		});
-	}
-}
-
 function readyUp() {
-	var me = currentRoom.userList.find(u => u.user.UID === user.UID);
-	me.user.isReady = !me.user.isReady;
-	displayUsers();
+	var me = currentRoom.userList.find(u => u.UID === user.UID);
+	me.isReady = !me.isReady;
+	const packet =  {
+		"requestType": "updateUser",
+		"user": me,
+		"RID": RID
+	};
+	ws.send(JSON.stringify(packet));
+	// NOTE: Potional Error
+	if(checkReadyStatus()) {
+		roundCountdown();
+	}
+}
+
+function checkReadyStatus() {
+	var startGame = true;
+	currentRoom.userList.forEach(user => {
+		if (user.isReady == false) {
+			startGame = false;
+		}
+	});
+
+	return startGame;
 }
 
 function forceStart() {
+	roundCountdown();	
+}
 
+async function roundCountdown() {
+	const packet = { 
+		"requestType": "startCountdown",
+		"RID": RID
+	}
+
+	ws.send(JSON.stringify(packet));
+}
+
+function startGame() {
+	document.location.href = "Game.php?RID=" + RID;
 }
 
 ws.onopen = () => {

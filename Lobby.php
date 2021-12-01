@@ -3,6 +3,18 @@
 <?php session_start();?>
 
 <head>
+    <script>
+	function getUserInfomation() {
+             return {
+                 "Name": <?php echo '"'.$_SESSION['userId'].'"'; ?>,
+		 "UID" : <?php echo '"'.$_SESSION['Id'].'"'; ?>,
+		 "closeTime": -1,
+		 "isLeader": false,
+		 "isReady": false,
+		 "score": 0
+                }
+        }
+    </script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,19 +23,23 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">	
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
-    <script src = ./Client.js></script>
-    <script src="Lobby.js"></script>
     <script src="Keyboard.js"></script>
     <link rel="stylesheet" href="style.css">
-    <title>Wheel of Fortune</title>
-    <script>
-	function getUserInfomation() {
-             return {
-                 "Name": <?php echo '"'.$_SESSION['userId'].'"'; ?>,
-                 "UID" : <?php echo '"'.$_SESSION['Id'].'"'; ?>
-             }
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <style>
+	.swal-overlay {
+		z-index: 1;
+	}
+        .swal-modal {
+            background-color: rgba(72, 21, 131, 0.9);
+	    border: none;
         }
-    </script>
+
+        .swal-title {
+            color: rgb(255, 223, 79);
+        }
+    </style>
+    <title>Wheel of Fortune</title>
 </head>
 
 <body align="center">
@@ -60,3 +76,6 @@
 	</div>
 
 </body>	
+<script src = ./Client.js></script>
+<script src="./Lobby.js"></script>
+</html>

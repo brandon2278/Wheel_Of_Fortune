@@ -261,11 +261,11 @@ tr.container1 {
 	width: 100%;
 	height: 100;
 	padding: 5px 0;
+  	z-index: 100000000;
 	box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
 	background-color: grey;
 	user-select: none;
 	transition: bottom 0.4s;
-  z-index: 10000;
 }
 
 /* Define the Mi'kmaq keyboard in the hidden state */
@@ -496,3 +496,101 @@ tr.container1 {
 input{
   font-family: sans-serif;
 }
+
+#infoContainer {
+  width: 20%;
+  height: 100%;
+  float: left;
+  margin-right: 5px;
+  
+}
+
+#solveContainer {
+  width: 80%;
+
+}
+
+#infoTab {
+  display: inline-block;
+  width: 30%;
+
+}
+
+#tabContainer {
+  height: 5%;
+  width: 100%;
+}
+
+#game-panel {
+    float: left;
+    background-color: rgba(30, 30, 30, 0.5);
+    width: 300px;
+    height: 80%;
+}
+#game-panel-tabs {
+    text-align: center;
+    width: 100%;
+    height: 30px;
+    font-size: 20px;
+    background-color: rgba(30, 30, 30, 0.8);
+}
+.game-panel-tab {
+    float: left;
+    clear: none;
+    display: inline-block;
+    height: 100%;
+    width: 33%;
+    border-bottom: 1px #505050 solid;
+}
+.game-panel-tab:hover {
+    background-color: rgba(20, 20, 20, 1.0);
+    cursor: pointer; 
+}
+#game-panel-chat-message-container {
+    height: calc(100% - 40px);
+    overflow: hidden;
+}
+.game-panel-tab:last-child {
+    border-right: none;
+}
+.game-panel-tab-selected {
+    border-bottom: 1px #ffffff solid;
+}
+#game-panel-content {
+    width: 100%;
+    height: 100%;
+}
+#game-panel-chat {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(70, 70, 70, 0.5);
+}
+#game-panel-chat input {
+    height: 40px;
+    width: 100%;
+}
+#game-panel-users {
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: orange;
+    background-color: rgba(30, 30, 30, 0.5);
+}
+.game-panel-user {
+}
+.game-panel-user-name {
+    display: inline-block;
+    margin-right: 30px;
+}
+.game-panel-user-score {
+    display: inline-block;
+}
+#game-panel-info {
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: orange;
+    background-color: rgba(30, 30, 30, 0.5);
+}
+
