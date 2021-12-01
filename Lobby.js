@@ -27,6 +27,9 @@ serverCallbacks.addEventListener("startGame", (e) => {
 });
 
 serverCallbacks.addEventListener("startCountdown", async (e) => {
+	var audio = new Audio("./audio/lobbyCount.mp3");
+	audio.play();
+
 	await countdown(1000, "Starting!!!");
 	const packet = {
 		"requestType": "startGame",
@@ -114,6 +117,16 @@ function checkReadyStatus() {
 }
 
 function forceStart() {
+	var forceStartMessage = user.Name + " Has Force Started The Game!!!";
+	forceStartMessage.bold();
+	const packet = {
+		"requestType": "sendMessage",
+		"message": forceStartMessage,
+		"user": {"Name": "Server"},
+		"RID": RID
+	}
+	ws.send(JSON.stringify(packet));
+
 	roundCountdown();	
 }
 

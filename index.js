@@ -153,15 +153,6 @@ var solver = document.getElementById('solve');
 // Function to later allow user to solve
 solvePhrase.onclick = function () {
   solver.style.display = "block";
-  var solved = document.getElementById('solved');
-  solved.innerHTML = '<span id=\"closed1\" class=\"close\">&times;</span><div><form class="container" action="" method="post" > ' +
-    '<div class="form-outline mb-4">' +
-    '<label class="form-label" for=\"guess\">Enter Guess:</label>' +
-    '<input class="form-control form-control-lg useGameKeyboard" name="guess" type="text"></div>' +
-    ' <input type="hidden" id="tempScore1" name="tempScore1" value="" />' +
-    '<input type="hidden" id="usrScore1" name="usrScore1" value="" />' +
-    '<input class="btn btn-warning" type="button" name="solved" value="SOLVE">' +
-    '</form></div>';
   var closed1 = document.getElementById("closed1");
   closed1.onclick = function () {
     solver.style.display = "none";

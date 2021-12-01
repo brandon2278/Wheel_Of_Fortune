@@ -1,4 +1,4 @@
-let ws = new WebSocket("ws://127.0.0.1:8010");
+let ws = new WebSocket("wss://ddmo.xyz/wof/ws");
 
 var user = {
 	"Name": "Tester",
@@ -140,6 +140,11 @@ function createGame() {
 	createRoom(roomData);
 }
 
+function closeCreateGame() {
+	var createLobby = document.getElementById("create-lobby");
+	createLobby.style.visibility = "hidden";
+}
+
 function displayRooms() {
 	var body = document.getElementById("lobby");
 	body.innerHTML = "";
@@ -147,7 +152,7 @@ function displayRooms() {
 	var menuButton = document.createElement("button");
 	menuButton.innerHTML = "Back";
 	menuButton.className = "btn btn-dark";
-	menuButton.onclick = () => { document.location.href = 'Menu.php'; }
+	menuButton.onclick = () => { document.location.href = 'index.php'; }
 	menuButton.style.fontSize = "2em";
 	body.appendChild(menuButton);
 
@@ -158,6 +163,7 @@ function displayRooms() {
 		createLobby.style.visibility = "visible";
 	}
 	createLobbyButton.style.fontSize = "2em";
+	createLobbyButton.style.marginLeft = "20px";
 	body.appendChild(createLobbyButton);
 
 	var lobbyContainer = document.createElement("div");

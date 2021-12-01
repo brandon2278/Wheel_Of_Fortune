@@ -66,7 +66,7 @@
                                     </div>
 
                                     <div class="form-outline mb-4">
-                                        <label class="form-label" for="picture">Bankrupt Multiplier</label>
+                                        <label class="form-label" for="picture">Wrong Answer Multiplier</label>
                                         <input id = "create-game-bankrupt-multiplier" type="number" step = "0.1" value = "1" min = "0" max = "1" class="form-control form-control-lg">
 				    </div>
 
@@ -76,6 +76,7 @@
                                     </div>
 
                                     <button onclick = "createGame()" class="btn btn-warning" style="font-family:fortune;">Create</button>
+                                    <button onclick = "closeCreateGame()" class="btn btn-warning" style="font-family:fortune;">Cancel</button>
                             </div>
                         </div>
                     </div>

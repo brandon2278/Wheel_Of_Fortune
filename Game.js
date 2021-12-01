@@ -9,7 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	var keys = document.querySelectorAll(".keyboard-letters");
 	keys.forEach((key) => {
-		key.addEventListener("click", () => checkLetter(key.innerText));
+		key.addEventListener("click", () => {
+			let audio = new Audio("./audio/Clicking.mp3");
+			audio.play();
+			checkLetter(key.innerText);
+		});
 		key.style.removeProperty('color');
 	});
 
@@ -138,6 +142,9 @@ function displayUsers() {
 }
 
 function gamePanelChangeTab(tab) {
+    let audio = new Audio("./audio/Clicking.mp3");
+    audio.play();
+
     let tabs = document.querySelectorAll(".game-panel-tab");
     let contentAreas = document.querySelectorAll(".game-panel-content-area");
 
@@ -328,6 +335,9 @@ function updateRoom(data) {
  * @author Colby O'Keefe (A00428974)
  */ 
 function solve() {
+	let audio = new Audio("./audio/Clicking.mp3");
+	audio.play();
+
 	swal({
 		title: "Enter Guess",
 		content: {
@@ -377,6 +387,9 @@ function solve() {
  */ 
 function buyVowel() {
 	if(!currentRoom.lastKey && currentRoom.hasVowel) {
+		let audio = new Audio("./audio/Clicking.mp3");
+		audio.play();
+
 		const packet = {
 			"requestType": "buyVowel",
 			"RID": RID
@@ -392,6 +405,9 @@ function buyVowel() {
  */ 
 function spinWheel() {
 	if(!currentRoom.lastKey) {
+		let audio = new Audio("./audio/Clicking.mp3");
+		audio.play();
+
 		const packet = {
 			"requestType": "spinWheel",
 			"RID": RID
@@ -473,6 +489,9 @@ function displayHint() {
 	var hint = currentRoom.puzzleHint.substring(1);
 	if (hint.charAt(0) !== '.') hint = '.' + hint;
 	hintButton.onclick = () => {
+		let audio = new Audio("./audio/Clicking.mp3");
+		audio.play();
+
 		const packet = {
 			"requestType": "playSound",
 			"RID": RID,
@@ -509,6 +528,9 @@ function displayQuestion() {
 		questionTitle.innerHTML = "Mi'kmaw Phrase:";
 		questionWord.innerHTML = " " + currentRoom.puzzlePhrase;
 		phraseButton.onclick = () => {
+			let audio = new Audio("./audio/Clicking.mp3");
+			audio.play();
+
 			const packet = {
 				"requestType": "playSound",
 				"RID": RID,

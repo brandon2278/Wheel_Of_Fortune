@@ -123,6 +123,7 @@ session_start();
         <ul align="center" class="list-unstyled">
             <li><a class="btn btn-dark" href="SelectCategory.php" role="button"> Single Player </a></li>
             <li><a class="btn btn-dark" href="SelectLobby.php" role="button"> Multiplayer </a></li>
+            <li><a class="btn btn-dark" href="Leaderboard.php" role="button"> Leaderboard </a></li>
         </ul>
     </section>
 
