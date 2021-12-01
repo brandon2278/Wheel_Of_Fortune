@@ -2,6 +2,14 @@ let db = require("./db.js");
 let serverData = require("./data.js");
 let communicate = require("./communicate.js");
 
+const vowels = ['a','á','e','é','i','í','o','ó','u','ú'];
+
+function resetsUserScores(RID) {
+	for (var user of serverData.roomList[RID].userList) {
+		user.score = 0;
+	}
+}
+
 /*
  * This routine fetches a random category from the database.
  *
@@ -116,7 +124,7 @@ function switchToNextPlayer(RID) {
 }
 
 function addScoreToPlayer(playerIndex, RID, score) {
-	if(score === "BANKRUPT") {
+	if(isNaN(score) && serverData.roomList[RID].userList[playerIndex].score > 0) {
 		serverData.roomList[RID].userList[playerIndex].score = 0; 
 	} else {
 
@@ -176,6 +184,8 @@ async function nextPuzzle(RID) {
 	serverData.roomList[RID].puzzlePhrase = getPuzzlePhrase(serverData.roomList[RID].currentPuzzle, serverData.roomList[RID].currentCategory);
 	serverData.roomList[RID].usedLetters = [];
 	serverData.roomList[RID].solved = {};
+	serverData.roomList[RID].hasVowel = true;
+	getRandomVowel(getPuzzleWord(serverData.roomList[RID].currentPuzzle,serverData.roomList[RID].currentCategory), {}, RID); 
 }
 
 async function nextRound(RID) {
@@ -186,7 +196,21 @@ async function nextRound(RID) {
 }
 
 function endMatch(RID) {
-	console.log("Game Has Ended!!!");
+	serverData.roomList[RID].status = "Waiting";
+}
+
+function findUserWithHigestScore(RID) {
+	var userList = serverData.roomList[RID].userList;
+	var highest = -100000000000000000000000000000000000;
+	var higestUser = null;
+	for (var user of userList) {
+		if (user.score > highest) {
+			highest = user.score;
+			highestUser = user;
+		}
+	}
+
+	return highestUser;
 }
 
 async function updateGame(RID) {
@@ -201,10 +225,13 @@ async function updateGame(RID) {
 
 	if(currentRound === maxRound && currentPuzzle === maxPuzzle) {
 		endMatch(RID);
+		var winner = findUserWithHigestScore(RID);
 		communicate.emitToRoom(RID, {
 			"responseType": "endMatch",
 			"room": communicate.formatRoom(serverData.roomList[RID]),
-			"solvedBy": oldPlayer
+			"solvedBy": oldPlayer,
+			"winningPlayer": winner.Name,
+			"winningScore": winner.score
 		});
 	} else if(currentPuzzle === maxPuzzle) {
 		await nextRound(RID);
@@ -260,12 +287,39 @@ function getPuzzleHint(puzzle, category) {
 	return hint;
 }
 
+function getRandomVowel(w, solved, RID) {
+	var word = w.toUpperCase();
+	var vowelsInWord = [];
+	vowels.forEach((vowel) => {
+		var used = false;
+		var slots = getLetterSlots(word, vowel);
+		slots.forEach((slot) => {
+			if(slot[0] in solved) {
+				used = true;
+			}
+		});
+
+		if (!used && word.includes(vowel.toUpperCase())) vowelsInWord.push(vowel);
+	});
+
+	console.log("Vowels: ", vowelsInWord);
+
+	if(vowelsInWord.length < 1) {
+		serverData.roomList[RID].hasVowel = false;
+	}
+
+	var index = Math.floor(Math.random() * vowelsInWord.length);
+
+	return vowelsInWord[index];
+}
+
 function guessIsCorrect(guess, answer) {
 	return guess.toUpperCase() === answer.toUpperCase();
 }
 
 module.exports = (requestHandler) => {
 	requestHandler.on("startGame", async (data, req) => {
+		resetsUserScores(data.RID)
 		serverData.roomList[data.RID].usedCategories = [];
 		serverData.roomList[data.RID].usedPuzzles = [];
 
@@ -285,13 +339,10 @@ module.exports = (requestHandler) => {
 		serverData.roomList[data.RID].currentRound = 1;
 		serverData.roomList[data.RID].currentPuzzleNumber = 1;
 		serverData.roomList[data.RID].lastKey = false;
+		serverData.roomList[data.RID].status = "In Game";
+		serverData.roomList[data.RID].hasVowel = true;
 
-		/*To Be Set In Lobby Creation*/
-		serverData.roomList[data.RID].maxNumberOfRounds = 2;
-		serverData.roomList[data.RID].puzzlesPerRound = 2;
-		serverData.roomList[data.RID].correctScore = 1000;
-		serverData.roomList[data.RID].lossModifier = 0.5;
-
+		getRandomVowel(getPuzzleWord(firstPuzzle, firstCategory), serverData.roomList[data.RID].solved, data.RID) 
 
 		communicate.emitToRoom(data.RID, {
 			"responseType": "startGame",
@@ -332,6 +383,7 @@ module.exports = (requestHandler) => {
 		
 		serverData.roomList[data.RID].usedLetters.push(data.letter);
 		switchToNextPlayer(data.RID);
+		getRandomVowel(currentWord, serverData.roomList[data.RID].solved, data.RID) 
 
 		if(isSolved(currentWord, data.RID)) {
 			await updateGame(data.RID);
@@ -392,6 +444,29 @@ module.exports = (requestHandler) => {
 			});
 		}
 		
+	});
+
+	requestHandler.on("buyVowel", async (data, req) => {
+		var currentPuzzle = serverData.roomList[data.RID].currentPuzzle;
+		var currentCategory = serverData.roomList[data.RID].currentCategory;
+		var currentWord = getPuzzleWord(currentPuzzle, currentCategory);
+		var currentPlayerIndex = serverData.roomList[data.RID].currentPlayerIndex;
+		var solved = serverData.roomList[data.RID].solved;
+		var vowel = getRandomVowel(currentWord, solved, data.RID);
+		var slots = getLetterSlots(currentWord, vowel);
+		
+		subtractScoreFromPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].vowelPrice);
+		slots.forEach((slot) => {
+			serverData.roomList[data.RID].solved[slot[0]] = slot[1];
+		});
+
+		serverData.roomList[data.RID].usedLetters.push(vowel);
+		switchToNextPlayer(data.RID);
+		getRandomVowel(currentWord, solved, data.RID);
+		communicate.emitToRoom(data.RID, {
+			"responseType": "updateRoom",
+			"room": communicate.formatRoom(serverData.roomList[data.RID])
+		});
 	});
 
 	return requestHandler;

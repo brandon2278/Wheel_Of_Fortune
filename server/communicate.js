@@ -19,7 +19,11 @@ function formatRoom(room) {
 		"puzzlePhrase": room.puzzlePhrase,
 		"correctScore": room.correctScore,
 		"lastKey": room.lastKey,
-		"lossModifier": room.lossModifier
+		"lossModifier": room.lossModifier,
+		"maxPlayerCount": room.maxPlayerCount,
+		"status": room.status,
+		"hasVowel": room.hasVowel,
+		"vowelPrice": room.vowelPrice
 	};
 }
 

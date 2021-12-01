@@ -130,7 +130,14 @@ module.exports = (requestHandler) => {
 		serverData.roomList[data.RID] = {
 			"userList": [],
 			"roomName": data.roomName,
-			"messages": []
+			"messages": [],
+			"lossModifier": data.loss,
+			"correctScore": data.score,
+			"puzzlesPerRound": data.numPuzzles,
+			"maxNumberOfRounds": data.numRounds,
+			"maxPlayerCount": data.playerCount,
+			"status": data.status,
+			"vowelPrice": data.vowelPrice
 		}
 		data.user.isLeader = true;
 		joinRoom(data.RID, data.user, req.ws);

@@ -45,7 +45,7 @@ function updateRoom(data) {
 	currentRoom = data.room;
 
 	var playerCount = document.getElementById("player-count");
-	playerCount.innerHTML = "Player Count: " + currentRoom.userList.length + "/10";
+	playerCount.innerHTML = "Player Count: " + currentRoom.userList.length + "/" + currentRoom.maxPlayerCount;
 
 	displayMessages("chat-window");
 	displayUsers();
@@ -72,6 +72,24 @@ function displayUsers() {
 function readyUp() {
 	var me = currentRoom.userList.find(u => u.UID === user.UID);
 	me.isReady = !me.isReady;
+	var readyMessage;
+	if(me.isReady) {
+		readyMessage = me.Name + " Is Ready To Play!";
+		
+	} else {
+		readyMessage = me.Name + " Is No Longer Ready To Play!";
+	}
+
+	readyMessage.bold();
+	
+	const packetMessage = {
+		"requestType": "sendMessage",
+		"message": readyMessage,
+		"user": {"Name": "Server"},
+		"RID": RID
+	}
+	ws.send(JSON.stringify(packetMessage));
+
 	const packet =  {
 		"requestType": "updateUser",
 		"user": me,

@@ -43,9 +43,11 @@ serverCallbacks.addEventListener("nextRound", (e) => {
 	updateRoom(data);	
 });
 
-serverCallbacks.addEventListener("endMatch", (e) => {
+serverCallbacks.addEventListener("endMatch", async (e) => {
+	var audio = new Audio("./audio/winGame.mp3");
+	audio.play();
 	const data = e.detail;
-	document.location.href = "Lobby.php?RID=" + RID;
+	await displayWinner(data.solvedBy, data.winningPlayer, data.winningScore);
 });
 
 serverCallbacks.addEventListener("playSound", (e) => {
@@ -60,6 +62,26 @@ serverCallbacks.addEventListener("letterGuessResults", (e) => {
 	console.log("outFunction", data.score);
 	displayScoreChange(data.playerIndex, data.score);
 });
+
+async function displayWinner(solvedBy, winner, score) {
+	return await new Promise ( (res, rej) => { 
+		swal({
+			title: solvedBy + " Solved The Final Puzzle Earning $" + currentRoom.correctScore,
+		timer: 3000,
+			buttons: false
+		}).then(() => {
+			swal({
+				title: "The Game Has Ended... " + winner + " Won With A Score Of " + score,
+				timer: 3000,
+				buttons: false
+			}).then(() => {
+				countdown(1000, "Leaving...").then(() => {
+					document.location.href = "Lobby.php?RID=" + RID;
+				});
+			})
+		});
+	});
+}
 
 function displayGameInfo() {
 	var info = document.getElementById("game-panel-info");
@@ -146,11 +168,11 @@ async function displayNextRound(solvedBy) {
 function displayScoreChange(player, score) {
 	var windowTitle;
 	var audioPath;
-	if (score >= 0 && Number.isInteger(score))  {
+	if (score >= 0 && !isNaN(score))  {
 		windowTitle = currentRoom.userList[player].Name + " Has Gained " + score;
 		audioPath = "./audio/ding.mp3";
 	}
-	else if(score <= 0 && Number.isInteger(score)) {
+	else if(score <= 0 && !isNaN(score)) {
 		windowTitle = currentRoom.userList[player].Name + " Has Lost " + Math.abs(score);
 		audioPath = "./audio/buzz.mp3";
 	} else {
@@ -213,7 +235,7 @@ function removeUsedLetters() {
 	var usedLetters = currentRoom.usedLetters;
 
 	usedLetters.forEach((letter) => {
-		var letterContainer = document.getElementById(letter);
+		var letterContainer = document.getElementById(letter.toUpperCase());
 		letterContainer.style.color = "#3e3a47";
 		
 	});
@@ -282,6 +304,13 @@ function updateRoom(data) {
 		spinWheelButton.style.removeProperty('background');
 		buyVowelButton.style.removeProperty('background');
 	}
+
+	if(!currentRoom.hasVowel) {
+		buyVowelButton.style.background = "#626756"; 
+	} else {
+		buyVowelButton.style.removeProperty('background');
+	}
+
 	lettersVisibility();
 	optionsVisibility();
 	removeUsedLetters();
@@ -306,7 +335,7 @@ function solve() {
 			attributes: {
 				className: "useLobbyKeyboard",
 				onclick: () => {
-						element = document.querySelector(".useLobbyKeyboard");
+						element = document.querySelectorAll(".useLobbyKeyboard")[1];
 						console.log();
 						Keyboard.open("", currentValue => {
 							element.select();
@@ -318,7 +347,7 @@ function solve() {
 				}
 			},
 	    	button: {
-			text: "cancel",
+			text: "submit",
 			value: true,
 			visible: true,
 			className: "btn btn-warning",
@@ -347,8 +376,12 @@ function solve() {
  * @author Colby O'Keefe (A00428974)
  */ 
 function buyVowel() {
-	if(!currentRoom.lastKey) {
-
+	if(!currentRoom.lastKey && currentRoom.hasVowel) {
+		const packet = {
+			"requestType": "buyVowel",
+			"RID": RID
+		}
+		ws.send(JSON.stringify(packet));
 	}		
 }
 

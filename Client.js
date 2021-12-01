@@ -10,8 +10,6 @@ var user = {
 
 var roomList;
 
-var makingLobby = false;
-
 var currentRoom = null;
 const RID = document.location.href.split("=")[1];
 
@@ -20,7 +18,7 @@ var serverCallbacks = new EventTarget();
 serverCallbacks.addEventListener("updateRoomList", (e) => {
 	const data = e.detail;
 	roomList = data.roomList;
-	if (!makingLobby) displayRooms();
+	displayRooms();
 });
 
 serverCallbacks.addEventListener("updateRoom", (e) => {
@@ -36,6 +34,9 @@ function displayMessages(id) {
 		currentRoom.messages.reverse().forEach(m => {
 			var messageElement = document.createElement("p");
 			messageElement.innerHTML = m.userName + ": " + m.message;
+			if (m.userName === "Server") {
+				messageElement.style.color = "red";
+			}
 			chatWindow.appendChild(messageElement);
 		});
 	}
@@ -98,16 +99,45 @@ function joinRoom(RID) {
 	ws.send(JSON.stringify(packet));
 }
 
-function createRoom(roomName) {
+function createRoom(roomData) {
 	const RID = Math.random().toString();
 	const packet = {
 		"requestType": "createRoom",
-		"roomName": roomName,
+		"roomName": roomData.Name,
 		"RID": RID,
-		"user": user
+		"playerCount": parseInt(roomData.playerCount),
+		"numRounds": parseInt(roomData.numRounds),
+		"numPuzzles": parseInt(roomData.numPuzzles),
+		"score": parseInt(roomData.score),
+		"loss": parseFloat(roomData.loss),
+		"vowelPrice": parseInt(roomData.vowelPrice),
+		"user": user,
+		"status": "Waiting"
 	};
 	ws.send(JSON.stringify(packet));
 	document.location.href = "Lobby.php?RID=" + RID;
+}
+
+function createGame() {
+	var name = document.getElementById("create-game-name").value;
+	var playerCount = document.getElementById("create-game-player-count").value;
+	var numRounds = document.getElementById("create-game-round-count").value;
+	var numPuzzles = document.getElementById("create-game-puzzle-count").value;
+	var score = document.getElementById("create-game-round-reward").value;
+	var loss = document.getElementById("create-game-bankrupt-multiplier").value;
+	var vowelPrice = document.getElementById("create-game-vowel-price").value;
+
+	const roomData = {
+		"Name": name,
+		"playerCount": playerCount,
+		"numRounds": numRounds,
+		"numPuzzles": numPuzzles,
+		"score": score,
+		"loss": loss,
+		"vowelPrice": vowelPrice
+	};
+
+	createRoom(roomData);
 }
 
 function displayRooms() {
@@ -125,12 +155,7 @@ function displayRooms() {
 	createLobbyButton.innerHTML = "Create Lobby";
 	createLobbyButton.className = "btn btn-dark";
 	createLobbyButton.onclick = () => {
-		makingLobby = true;
 		createLobby.style.visibility = "visible";
-		createLobby.addEventListener("keydown", (e) => {
-			if(makingLobby) {
-			}
-		});
 	}
 	createLobbyButton.style.fontSize = "2em";
 	body.appendChild(createLobbyButton);
@@ -163,12 +188,19 @@ function displayRooms() {
 	for(let key in roomList) {
 		var lobbyRow = document.createElement("tr");
 		lobbyRow.style.fontSize = "1em";
-		lobbyRow.style.color = "white";
+		if(roomList[key].status === "Waiting" && roomList[key].userList.length < roomList[key].maxPlayerCount) {
+			lobbyRow.style.color = "white";
+		} else {
+			lobbyRow.style.color = "grey";
+		}
 		lobbyRow.style.textAlign = "center";
+
 
 		lobbyRow.onclick = (e) => {
 			const RID = key;
-			document.location.href = "Lobby.php?RID=" + RID;
+			if(roomList[RID].status === "Waiting" && roomList[key].userList.length < roomList[key].maxPlayerCount) {
+				document.location.href = "Lobby.php?RID=" + RID;
+			}
 		};
 
 		var lobbyName = document.createElement("td");
@@ -178,7 +210,7 @@ function displayRooms() {
 
 		lobbyName.innerHTML = roomList[key].roomName;
 
-		lobbyCount.innerHTML = roomList[key].userList.length + "/10";
+		lobbyCount.innerHTML = roomList[key].userList.length + "/" + roomList[key].maxPlayerCount;
 
 		var leader = null;
 		roomList[key].userList.forEach(u => {
@@ -189,7 +221,7 @@ function displayRooms() {
 
 		lobbyLeader.innerHTML = leader;
 
-		lobbyStatus.innerHTML = "Waiting";
+		lobbyStatus.innerHTML = roomList[key].status;
 
 		lobbyRow.appendChild(lobbyName);
 		lobbyRow.appendChild(lobbyCount);
