@@ -11,7 +11,10 @@
 		 "closeTime": -1,
 		 "isLeader": false,
 		 "isReady": false,
-		 "score": 0
+		 "score": 0,
+		 "mouseX": 0,
+		 "mouseY": 0,
+		 "inGame": false
                 }
         }
     </script>
@@ -64,9 +67,10 @@
 			</div>
 
 			<div id = "control-container" align = "center">	
-				<button onclick="readyUp()" class="btn btn-dark" style="font-size: 2em;">Ready Up</button>
+				<button onclick="readyUp()" class="btn btn-dark" style="font-size: 2em;" id="ready-up">Ready Up</button>
 				<button onclick="forceStart()" class="btn btn-dark" style = "display: none; font-size: 2em;" id="force-start">Force Start</button>
-				<button onclick="leaveRoom()" class="btn btn-dark" style="font-size: 2em">Leave Room</button>
+				<button onclick="leaveRoom()" class="btn btn-dark" style="font-size: 2em" id="leave-room">Leave Room</button>
+				<button onclick="reconnect()" class="btn btn-dark" style="font-size: 2em" id="reconnect">Reconnect</button>
 			</div>
 		</div>
 

@@ -1,11 +1,14 @@
-let ws = new WebSocket("wss://ddmo.xyz/wof/ws");
+let ws = new WebSocket("ws://127.0.0.1:8010");
 
 var user = {
 	"Name": "Tester",
 	"UID" : -1,
 	"closeTime": -1,
 	"isLeader": false,
-	"isReady": false
+	"isReady": false,
+	"mouseX": 0,
+	"mouseY": 0,
+	"inGame": false
 }
 
 var roomList;
@@ -22,7 +25,6 @@ serverCallbacks.addEventListener("updateRoomList", (e) => {
 });
 
 serverCallbacks.addEventListener("updateRoom", (e) => {
-	console.log("Updating Room")
 	const data = e.detail;
 	updateRoom(data);
 });
@@ -151,20 +153,19 @@ function displayRooms() {
 	
 	var menuButton = document.createElement("button");
 	menuButton.innerHTML = "Back";
-	menuButton.className = "btn btn-warning";
+	menuButton.className = "btn btn-dark";
 	menuButton.onclick = () => { document.location.href = 'index.php'; }
-	menuButton.style.fontSize = "1.2em";
+	menuButton.style.fontSize = "2em";
 	body.appendChild(menuButton);
 
 	var createLobbyButton = document.createElement("button");
 	createLobbyButton.innerHTML = "Create Lobby";
-	createLobbyButton.className = "btn btn-warning";
+	createLobbyButton.className = "btn btn-dark";
 	createLobbyButton.onclick = () => {
 		createLobby.style.visibility = "visible";
 	}
-	createLobbyButton.style.fontSize = "1.2em";
+	createLobbyButton.style.fontSize = "2em";
 	createLobbyButton.style.marginLeft = "20px";
-	createLobbyButton.style.margin = "20px";
 	body.appendChild(createLobbyButton);
 
 	var lobbyContainer = document.createElement("div");

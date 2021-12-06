@@ -11,7 +11,10 @@
 		 "isLeader": false,
 		 "isReady": false,
 		 "score": 0,
-		 "madeMove": false
+		 "madeMove": false,
+		 "mouseX": 0,
+		 "mouseY": 0,
+		 "inGame": true
              }
         }
     </script>
@@ -29,7 +32,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>    
     <style>
 	.swal-overlay {
-		z-index: 1;
+		z-index: 50;
 	}
         .swal-modal {
             background-color: rgba(72, 21, 131, 0.9);
@@ -43,7 +46,7 @@
     <title>Wheel of Fortune</title>
   </head>
 
-  <body>
+  <body id="game-body">
 
     <div id = "game-panel">
         <div id = "game-panel-tabs">
@@ -94,6 +97,7 @@
 
     <center>
     <div id="solveContainer">
+	<div id="screen-cover"> </div>
 
 		<h3 id="question-container">
 			<span id="question-title"></span>
@@ -114,7 +118,7 @@
                             <h2>Mi'Kmaw Response</h2>
                         </div>
                         <div class="puzzle-section">
-                            <div class="puzzle-grid">
+                            <div class="puzzle-grid" id="puzzle-grid">
                                 <!-- Empty containers to make up the puzzle grid -->
                                 <div class="letter-container empty"></div>
                                 <div class="letter-container"></div>
@@ -130,135 +134,10 @@
                                 <div class="letter-container"></div>
                                 <div class="letter-container"></div>
                                 <div class="letter-container empty"></div>
-                                <!-- Containers that will contain the phrases -->
-                                <div class="letter-container">
-                                    <span id="0" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="1" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="2" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="3" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="4" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="5" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="6" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="7" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="8" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="9" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="10" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="11" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="12" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="13" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="14" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="15" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="16" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="17" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="18" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="19" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="20" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="21" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="22" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="23" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="24" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="25" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="26" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="27" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="28" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="29" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="30" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="31" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="32" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="33" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="34" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="35" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="36" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="37" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="38" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="39" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="40" class="letter-content"></span>
-                                </div>
-                                <div class="letter-container">
-                                    <span id="41" class="letter-content"></span>
-                                </div>
+				<!-- Containers that will contain the phrases -->
+
                                 <!-- Empty containers to make up the puzzle grid -->
-                                <div class="letter-container empty"></div>
+                                <div class="letter-container empty" id="start-tile"></div>
                                 <div class="letter-container"></div>
                                 <div class="letter-container"></div>
                                 <div class="letter-container"></div>
@@ -310,16 +189,12 @@
                           <br></br>
                          </div>
                           <button class="btn btn-warning" id="hint"><i class="fas fa-volume-up"></i> Hint</button>
+    			  <button class="btn btn-warning" onclick="leaveGame()" id="leave-game">Leave Game </button>
                 </div>
             </div>
         </div>
     </div>
     </center>
-
-    <div id="keyContainer">
-
-    </div>
-
   </body>
   <script src = ./Client.js></script>
   <script src="./Game.js"></script>

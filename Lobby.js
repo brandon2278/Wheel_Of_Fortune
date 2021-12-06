@@ -52,6 +52,25 @@ function updateRoom(data) {
 
 	displayMessages("chat-window");
 	displayUsers();
+	displayOptions();
+}
+
+function displayOptions() {
+	if (currentRoom.status === "In Game") {
+		document.getElementById("force-start").style.visibility = "hidden";	
+		document.getElementById("ready-up").style.visibility = "hidden";	
+		document.getElementById("leave-room").style.visibility = "visible";	
+		document.getElementById("reconnect").style.visibility = "visible";	
+	} else {
+		document.getElementById("force-start").style.visibility = "visible";	
+		document.getElementById("ready-up").style.visibility = "visible";	
+		document.getElementById("leave-room").style.visibility = "visible";	
+		document.getElementById("reconnect").style.visibility = "hidden";
+	}
+}
+
+function reconnect() {
+	document.location.href = "Game.php?RID=" + RID;
 }
 
 function displayUsers() {

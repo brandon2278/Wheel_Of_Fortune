@@ -1,3 +1,5 @@
+var hasStarted = false;
+
 document.addEventListener("DOMContentLoaded", () => {
 	messageBox = document.getElementById("game-panel-chat");
 	messageBox.addEventListener("keydown", (e) => {
@@ -20,6 +22,28 @@ document.addEventListener("DOMContentLoaded", () => {
 	if (currentRoom != null) removeUsedLetters();
 });
 
+document.addEventListener('mousemove', (e) => {
+	updateMousePosition(e); 
+	const packet = {
+		"requestType": "updatePointers",
+		"RID": RID,
+		"user": user
+	};
+
+	ws.send(JSON.stringify(packet));
+});
+
+window.addEventListener('beforeunload', (e) => {
+	user.inGame = false;
+	const packet = {
+		"requestType": "leaveGame",
+		"RID": RID,
+		"user": user
+	};
+
+	ws.send(JSON.stringify(packet));
+}, false);
+
 serverCallbacks.addEventListener("getRoom", (e) => {
 	const data = e.detail;
 	updateRoom(data);
@@ -35,15 +59,21 @@ serverCallbacks.addEventListener("spinWheel", (e) => {
 
 serverCallbacks.addEventListener("nextPuzzle", (e) => {
 	const data = e.detail;
-	displaySolvedDetails(data.solvedBy);
+	currentRoom = data.room;
+	displaySolvedDetails(data.solvedBy).then(() => {
+		displayNextPlayer();
+	});
 	resetPuzzle(data.slots);
+	InitPuzzle(); 
 	updateRoom(data);	
 });
 
 serverCallbacks.addEventListener("nextRound", (e) => {
 	const data = e.detail;
+	currentRoom = data.room;
 	displayNextRound(data.solvedBy);
 	resetPuzzle(data.slots);
+	InitPuzzle(); 
 	updateRoom(data);	
 });
 
@@ -64,8 +94,113 @@ serverCallbacks.addEventListener("playSound", (e) => {
 serverCallbacks.addEventListener("letterGuessResults", (e) => {
 	const data = e.detail;
 	console.log("outFunction", data.score);
-	displayScoreChange(data.playerIndex, data.score);
+	displayScoreChange(data.playerIndex, data.score).then(() => {
+		displayNextPlayer();
+	});
 });
+
+serverCallbacks.addEventListener("startUp", (e) => {
+	const data = e.detail;
+	currentRoom = data.room;
+	resetPuzzle();
+	InitPuzzle();
+	if (!hasStarted) displayNextPlayer();
+	hasStarted = true;
+	updateRoom(data);
+});
+
+serverCallbacks.addEventListener("showSolveAttempt", (e) => {
+	const data = e.detail;
+	if (user.UID !== currentRoom.userList[currentRoom.currentPlayerIndex].UID) {
+		swal({
+			title: currentRoom.userList[currentRoom.currentPlayerIndex].Name + " Is Solving The Puzzle: ",
+			content: {
+				element: "span",
+				attributes: {
+					innerHTML: data.value
+				}
+			},
+			buttons: false
+		});
+	}
+});
+
+serverCallbacks.addEventListener("boughtVowel", (e) => {
+	const data = e.detail;
+	displayBoughtVowel(data.vowel, data.player).then(() => {
+		displayNextPlayer();
+	});
+});
+
+async function displayBoughtVowel(vowel, name) {
+	return await new Promise((res, rej) => {
+		swal({
+			title: name + " Has Bought the Vowel " + vowel + " for $" + currentRoom.vowelPrice,
+			button: false,
+			timer: 3500
+		}).then(() => {
+			res();
+		});
+	});
+}
+
+function displayNextPlayer() {
+	swal({
+		title: "It's Now " + currentRoom.userList[currentRoom.currentPlayerIndex].Name + "'s Turn",
+		timer: 3000,
+		buttons: false
+	});
+}
+
+function leaveGame() {
+	document.location.href = "Lobby.php?RID=" + RID;
+	user.inGame = false;
+
+	const packet = {
+		"requestType": "leaveGame",
+		"RID": RID,
+		"user": user
+	};
+	
+	ws.send(JSON.stringify(packet));
+
+}
+
+function displayUsersMouse() {	
+	currentRoom.userList.forEach( (u) => {
+		var mousePointer = document.getElementById("UID=" + u.UID);
+		if (u.inGame === false) {
+			if (mousePointer !== null) mousePointer.remove();
+			return;
+		}
+		var mouseX = u.mouseX;
+		var mouseY = u.mouseY;
+		//TODO: Only make new element when new user joins.
+		if (mousePointer ==  null) {
+			mousePointer = document.createElement("span");
+			mousePointer.id = "UID=" + u.UID;
+			mousePointer.className = "mouse-pointer";
+			var nameTag = document.createElement("div");
+			nameTag.innerHTML = u.Name;
+			nameTag.style.margin = "15px";
+			nameTag.style.color = "#FF0000";
+			mousePointer.appendChild(nameTag);
+			document.getElementById("game-body").appendChild(mousePointer);
+		}
+		var visible;
+		if (u.UID === currentRoom.userList[currentRoom.currentPlayerIndex].UID && u.UID !== user.UID) {
+			visible = "visible";	
+		} else {
+			visible = "hidden";
+		}
+		mousePointer.style = "visibility: " + visible + "; margin-left: auto; margin-right: 0; pointer-events: none; position: absolute; left: " + mouseX + "px; top: " + mouseY + "px;";
+	});
+}
+
+function updateMousePosition(e) {
+	user.mouseX = e.clientX;
+	user.mouseY = e.clientY;
+}
 
 async function displayWinner(solvedBy, winner, score) {
 	return await new Promise ( (res, rej) => { 
@@ -120,6 +255,7 @@ function displayUsers() {
 	var userListContainer = document.getElementById("game-panel-users");
 	userListContainer.innerHTML = "";
 	for(const user of currentRoom.userList) {
+		if (user.inGame === false) continue;
 		var userContainer = document.createElement("div");
 		var nameContainer = document.createElement("div");
 		var scoreContainer = document.createElement("div");
@@ -167,12 +303,12 @@ async function displayNextRound(solvedBy) {
 			timer: 3000,
 			buttons: false
 		}).then(() => {
-			countdown(1000, "Start!");
+			countdown(1000, "It's Now " + currentRoom.userList[currentRoom.currentPlayerIndex].Name + " Turn");
 		})
 	});
 }
 
-function displayScoreChange(player, score) {
+async function displayScoreChange(player, score) {
 	var windowTitle;
 	var audioPath;
 	if (score >= 0 && !isNaN(score))  {
@@ -195,28 +331,26 @@ function displayScoreChange(player, score) {
 
 	ws.send(JSON.stringify(packet));
 
-	swal({
-		title: windowTitle,
-		button: {
-			text: "continue",
-			value: true,
-			visible: true,
-			className: "btn btn-warning",
-			closeModal: true,
-		}
+	return await new Promise((res, rej) => {
+		swal({
+			title: windowTitle,
+			button: false,
+			timer: 3500
+		}).then(() => {
+			res();
+		});
 	});
 }
 
-function displaySolvedDetails(solvedBy) {
-	swal({
-		title: solvedBy + " Solved The Puzzle Earning $" + currentRoom.correctScore,
-		button: {
-			text: "continue",
-			value: true,
-			visible: true,
-			className: "btn btn-warning",
-			closeModal: true,
-		}
+async function displaySolvedDetails(solvedBy) {
+	return await new Promise((res, rej) => {
+		swal({
+			title: solvedBy + " Solved The Puzzle Earning $" + currentRoom.correctScore,
+			button: false,
+			timer: 3500
+		}).then(() => {
+			res();
+		});
 	});
 
 }
@@ -255,14 +389,33 @@ function addAllKeys() {
 	});
 }
 
-function resetPuzzle(slots) {
-	addAllKeys() 
-	for(var i = 0; i < slots.length; i++) {
-		var letter = document.getElementById(slots[i]);
-		var letterContainer = letter.parentElement;
-		letterContainer.style.removeProperty('background');
-		letter.innerHTML = "";
+function InitPuzzle() {
+	var numLetters = currentRoom.slots[currentRoom.slots.length - 1] + 1;
+	if (numLetters % 14 !== 0) numLetters += 14 - numLetters % 14;
+
+	if (numLetters < 42) numLetters = 42;
+	console.log(numLetters);
+	var startLetter = document.getElementById("start-tile");
+	for (var i = 0; i < numLetters; i++) {
+		var container = document.createElement("div");
+		container.classList.add("letter-container", "useable-container");
+		var letter = document.createElement("span")
+		letter.className = "letter-content";
+		letter.id = i.toString();
+
+		container.appendChild(letter);
+		document.getElementById("puzzle-grid").insertBefore(container, startLetter);
 	}
+	
+}
+
+function resetPuzzle(slots) {
+	addAllKeys();
+	var letterContainers = document.querySelectorAll(".useable-container");
+	console.log(letterContainers);
+	letterContainers.forEach((container) => {
+		container.remove();
+	});
 }
 
 function updatePuzzle() {
@@ -279,7 +432,7 @@ function updatePuzzle() {
 function optionsVisibility() {
 	var currentPlayer = currentRoom.userList[currentRoom.currentPlayerIndex]
 	var optionContainer = document.getElementById("option-container");
-	if(user.UID === currentPlayer.UID && !currentPlayer.madeMove) {
+	if(!currentPlayer.madeMove) {
 		optionContainer.style.visibility = "visible";
 	} else {
 		optionContainer.style.visibility = "hidden";
@@ -289,7 +442,7 @@ function optionsVisibility() {
 function lettersVisibility() {
 	var currentPlayer = currentRoom.userList[currentRoom.currentPlayerIndex]
 	var keyboardContainer = document.getElementById("keyboard-section");
-	if(user.UID === currentPlayer.UID && currentPlayer.madeMove) {
+	if(currentPlayer.madeMove) {
 		keyboardContainer.style.visibility = "visible";
 	} else {
 		keyboardContainer.style.visibility = "hidden";
@@ -301,18 +454,23 @@ function lettersVisibility() {
  * @author Colby O'Keefe (A00428974)
  */
 function updateRoom(data) {
+	var screenCover = document.getElementById("screen-cover");
 	var spinWheelButton = document.getElementById("spin-wheel-btn");
 	var buyVowelButton = document.getElementById("buy-vowel-btn");
 	currentRoom = data.room;
-	if (currentRoom.lastKey) {
-		spinWheelButton.style.background = "#626756"; 
-		buyVowelButton.style.background = "#626756"; 
+	if (currentRoom.userList[currentRoom.currentPlayerIndex].UID === user.UID) {
+		screenCover.style.display = "none";
 	} else {
-		spinWheelButton.style.removeProperty('background');
-		buyVowelButton.style.removeProperty('background');
+		screenCover.style.display = "block";
 	}
 
-	if(!currentRoom.hasVowel) {
+	if (currentRoom.lastKey) {
+		spinWheelButton.style.background = "#626756"; 
+	} else {
+		spinWheelButton.style.removeProperty('background');
+	}
+
+	if(!currentRoom.hasVowel || currentRoom.lastKey) {
 		buyVowelButton.style.background = "#626756"; 
 	} else {
 		buyVowelButton.style.removeProperty('background');
@@ -327,6 +485,7 @@ function updateRoom(data) {
 	displayMessages("game-panel-chat-message-container");
 	displayUsers();
 	displayGameInfo();
+	displayUsersMouse();
 }
 
 /*
@@ -345,17 +504,26 @@ function solve() {
 			attributes: {
 				className: "useLobbyKeyboard",
 				onclick: () => {
-						element = document.querySelectorAll(".useLobbyKeyboard")[1];
-						console.log();
-						Keyboard.open("", currentValue => {
-							element.select();
-							let next = currentValue.substr(currentValue.length - 1);
-							if (lastKey !== "backspace") element.value += next;
-							else element.value = element.value.slice(0, -1);
-						})
+					element = document.querySelectorAll(".useLobbyKeyboard")[1];
+					console.log();
+					Keyboard.open("", currentValue => {
+						element.select();
+						let next = currentValue.substr(currentValue.length - 1);
+						if (lastKey !== "backspace") element.value += next;
+						else element.value = element.value.slice(0, -1);
+					})
+				},
+				oninput: (e) => {
+					var currentValue = e.srcElement.value;
+					const packet = {
+						"requestType": "showSolveAttempt",
+						"RID": RID,
+						"value": currentValue
 					}
+					ws.send(JSON.stringify(packet));
 				}
 			},
+		},
 	    	button: {
 			text: "submit",
 			value: true,
@@ -432,13 +600,8 @@ function closeWheel(indicatedSegment) {
 
 		swal({
 		    title: currentRoom.userList[currentRoom.currentPlayerIndex].Name + " Has $" + indicatedSegment.text + " At Stake",
-		    button: {
-			text: "continue",
-			value: true,
-			visible: true,
-			className: "btn btn-warning",
-			closeModal: true,
-		    }
+		    button: false,
+		    timer: 3500
 		});
 	} else {
 		const packet = {
@@ -451,13 +614,8 @@ function closeWheel(indicatedSegment) {
 
 		swal({
 		    title: currentRoom.userList[currentRoom.currentPlayerIndex].Name + " Has Gone Brankrupt",
-		    button: {
-			text: "continue",
-			value: true,
-			visible: true,
-			className: "btn btn-warning",
-			closeModal: true,
-		    }
+		    button: false,
+		    timer: 3500
 		});
 	}
 	wheelContainer.style.display = "none";
@@ -547,9 +705,14 @@ ws.onopen = () => {
 	user = getUserInfomation();
 	joinRoom(RID);
 	const packet = {
-		"requestType": "getRoom",
+		"requestType": "getInitRoom",
 		"RID": RID
 	};
-
+	const packet2 = {
+		"requestType": "updateUserStatus",
+		"RID": RID,
+		"user": user
+	};
 	ws.send(JSON.stringify(packet));
+	ws.send(JSON.stringify(packet2));
 };

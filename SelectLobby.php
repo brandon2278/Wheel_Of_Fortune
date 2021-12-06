@@ -11,7 +11,10 @@
 		 "closeTime": -1,
 		 "isLeader": false,
 		 "isReady": false,
-		 "score": 0
+		 "score": 0,
+		 "mouseX": 0,
+		 "mouseY": 0,
+		 "inGame": false
                 }
         }
     </script>

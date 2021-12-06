@@ -57,7 +57,6 @@ async function getRandomPuzzle(category, RID) {
 }
 
 /*
- * This function is to account for shit database layout
  *
  * @author Colby O'Keefe (A00428974)
  */ 
@@ -106,11 +105,15 @@ function getLetterSlots(word, letter) {
 	return slots
 }
 
-function getNextPlayer(currentPlayer, totalPlayers) {
+function getNextPlayer(currentPlayer, totalPlayers, RID) {
 	var nextPlayer = currentPlayer + 1;
 
 	if(nextPlayer == totalPlayers) {
-		nextPlayer = 0
+		nextPlayer = 0;
+	}
+
+	if (serverData.roomList[RID].userList[nextPlayer].inGame === false) {
+		nextPlayer = getNextPlayer(nextPlayer, totalPlayers, RID);
 	}
 
 	return nextPlayer;
@@ -119,23 +122,24 @@ function getNextPlayer(currentPlayer, totalPlayers) {
 function switchToNextPlayer(RID) {
 	var userList = serverData.roomList[RID].userList;
 	var currentPlayerIndex = serverData.roomList[RID].currentPlayerIndex;
-	var nextPlayerIndex = getNextPlayer(currentPlayerIndex, userList.length);
+	var nextPlayerIndex = getNextPlayer(currentPlayerIndex, userList.length, RID);
 	serverData.roomList[RID].currentPlayerIndex = nextPlayerIndex;
 }
 
 function addScoreToPlayer(playerIndex, RID, score) {
+	console.log("Score: ", score);
 	if(isNaN(score) && serverData.roomList[RID].userList[playerIndex].score > 0) {
 		serverData.roomList[RID].userList[playerIndex].score = 0; 
-	} else {
+	} else if(!isNaN(score)) {
 
 		serverData.roomList[RID].userList[playerIndex].score += parseInt(score); 
 	}
 }
 
 function subtractScoreFromPlayer(playerIndex, RID, score) {
-	if(score === "BANKRUPT") {
+	if(isNaN(score) && serverData.roomList[RID].userList[playerIndex].score > 0) {
 		serverData.roomList[RID].userList[playerIndex].score = 0; 
-	} else {
+	} else if(!isNaN(score)){
 
 		serverData.roomList[RID].userList[playerIndex].score -= parseInt(score); 
 	}
@@ -199,6 +203,10 @@ function endMatch(RID) {
 	serverData.roomList[RID].status = "Waiting";
 }
 
+function createBoardRow(startIndex) {
+	
+}
+
 function findUserWithHigestScore(RID) {
 	var userList = serverData.roomList[RID].userList;
 	var highest = -100000000000000000000000000000000000;
@@ -213,10 +221,11 @@ function findUserWithHigestScore(RID) {
 	return highestUser;
 }
 
-async function updateGame(RID) {
+async function updateGame(RID, oldPlayerIndex) {
 	serverData.roomList[RID].lastKey = false;
 	var oldSlots = serverData.roomList[RID].slots;
-	var oldPlayer = serverData.roomList[RID].userList[serverData.roomList[RID].currentPlayerIndex].Name;
+	var oldPlayer = serverData.roomList[RID].userList[oldPlayerIndex].Name;
+	console.log("index: ", oldPlayerIndex);
 	var currentPuzzle = serverData.roomList[RID].currentPuzzleNumber;
 	var currentRound = serverData.roomList[RID].currentRound;
 	var maxPuzzle = serverData.roomList[RID].puzzlesPerRound;
@@ -317,8 +326,28 @@ function guessIsCorrect(guess, answer) {
 	return guess.toUpperCase() === answer.toUpperCase();
 }
 
+function hasPlayersLeftInGame(RID) {
+	var hasPlayers = false;
+	serverData.roomList[RID].userList.every((user) => {
+		if (user.inGame === true) {
+			hasPlayers = true;
+			return false;
+		}
+		return true;
+	});
+
+	return hasPlayers;
+}
+
+function resetReadyStatus(RID) {
+	serverData.roomList[RID].userList.forEach((user) => {
+		user.isReady = false;
+	});
+}
+
 module.exports = (requestHandler) => {
 	requestHandler.on("startGame", async (data, req) => {
+		resetReadyStatus(data.RID)
 		resetsUserScores(data.RID)
 		serverData.roomList[data.RID].usedCategories = [];
 		serverData.roomList[data.RID].usedPuzzles = [];
@@ -342,7 +371,7 @@ module.exports = (requestHandler) => {
 		serverData.roomList[data.RID].status = "In Game";
 		serverData.roomList[data.RID].hasVowel = true;
 
-		getRandomVowel(getPuzzleWord(firstPuzzle, firstCategory), serverData.roomList[data.RID].solved, data.RID) 
+		getRandomVowel(getPuzzleWord(firstPuzzle, firstCategory), serverData.roomList[data.RID].solved, data.RID); 
 
 		communicate.emitToRoom(data.RID, {
 			"responseType": "startGame",
@@ -435,14 +464,15 @@ module.exports = (requestHandler) => {
 
 		if(guessIsCorrect(data.guess, currentWord)) {
 			addScoreToPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].correctScore);
-			await updateGame(data.RID);
+			await updateGame(data.RID, currentPlayerIndex);
 		} else {
 			subtractScoreFromPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].correctScore);
-			communicate.emitToRoom(data.RID, {
-				"responseType": "updateRoom",
-				"room": communicate.formatRoom(serverData.roomList[data.RID])
-			});
 		}
+
+		communicate.emitToRoom(data.RID, {
+			"responseType": "updateRoom",
+			"room": communicate.formatRoom(serverData.roomList[data.RID])
+		});
 		
 	});
 
@@ -454,6 +484,7 @@ module.exports = (requestHandler) => {
 		var solved = serverData.roomList[data.RID].solved;
 		var vowel = getRandomVowel(currentWord, solved, data.RID);
 		var slots = getLetterSlots(currentWord, vowel);
+		var playerName = serverData.roomList[data.RID].userList[serverData.roomList[data.RID].currentPlayerIndex].Name;
 		
 		subtractScoreFromPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].vowelPrice);
 		slots.forEach((slot) => {
@@ -466,6 +497,70 @@ module.exports = (requestHandler) => {
 		communicate.emitToRoom(data.RID, {
 			"responseType": "updateRoom",
 			"room": communicate.formatRoom(serverData.roomList[data.RID])
+		});
+
+		communicate.emitToRoom(data.RID, {
+			"responseType": "boughtVowel",
+			"vowel": vowel,
+			"player": playerName
+		});
+	});
+
+	requestHandler.on("updatePointers", (data, req) => {
+		var foundIndex = serverData.roomList[data.RID].userList.findIndex(u => u.UID === data.user.UID);
+		if (foundIndex !== -1) {
+			serverData.roomList[data.RID].userList[foundIndex].mouseX = data.user.mouseX;	
+			serverData.roomList[data.RID].userList[foundIndex].mouseY = data.user.mouseY;	
+		}
+
+		communicate.emitToRoom(data.RID, {
+			"responseType": "updateRoom",
+			"room": communicate.formatRoom(serverData.roomList[data.RID])
+		});
+	});
+
+	requestHandler.on("updateUserStatus", (data, req) => {
+		var foundIndex = serverData.roomList[data.RID].userList.findIndex(u => u.UID === data.user.UID);
+		if (foundIndex !== -1) {
+			serverData.roomList[data.RID].userList[foundIndex].inGame = data.user.inGame;	
+		}
+
+		communicate.emitToRoom(data.RID, {
+			"responseType": "updateRoom",
+			"room": communicate.formatRoom(serverData.roomList[data.RID])
+		});
+
+	});
+
+	requestHandler.on("getInitRoom", (data, req) => {
+		communicate.emitToRoom(data.RID, {
+			"responseType": "startUp",
+			"room": communicate.formatRoom(serverData.roomList[data.RID])
+		});
+	});
+
+	requestHandler.on("leaveGame", (data, req) => {
+		var foundIndex = serverData.roomList[data.RID].userList.findIndex(u => u.UID === data.user.UID);
+		if (foundIndex !== -1) {
+			serverData.roomList[data.RID].userList[foundIndex].inGame = data.user.inGame;	
+		}
+
+		if (!hasPlayersLeftInGame(data.RID)) {
+			serverData.roomList[data.RID].status = "Waiting"
+		} else if (serverData.roomList[data.RID].userList[serverData.roomList[data.RID].currentPlayerIndex].UID === data.user.UID) {
+			switchToNextPlayer(data.RID);
+		}
+
+		communicate.emitToRoom(data.RID, {
+			"responseType": "updateRoom",
+			"room": communicate.formatRoom(serverData.roomList[data.RID])
+		});
+	});
+
+	requestHandler.on("showSolveAttempt", (data, req) => {	
+		communicate.emitToRoom(data.RID, {
+			"responseType": "showSolveAttempt",
+			"value": data.value
 		});
 	});
 
