@@ -91,7 +91,8 @@ function updateRoom(RID) {
 function addMessage(text, RID, user) {
 	const message =  {
 		"message": text,
-		"userName": user.Name
+		"userName": user.Name,
+		"color": user.pointerColor
 	}
 	serverData.roomList[RID].messages.push(message);
 
@@ -137,7 +138,9 @@ module.exports = (requestHandler) => {
 			"maxNumberOfRounds": data.numRounds,
 			"maxPlayerCount": data.playerCount,
 			"status": data.status,
-			"vowelPrice": data.vowelPrice
+			"vowelPrice": data.vowelPrice,
+			"password": data.password,
+			"hasPassword": data.hasPassword
 		}
 		data.user.isLeader = true;
 		joinRoom(data.RID, data.user, req.ws);
@@ -181,6 +184,30 @@ module.exports = (requestHandler) => {
 		communicate.emitToRoom(data.RID, {
 			"responseType": "startCountdown"
 		});
+	});
+
+	requestHandler.on("checkLobbyPassword", (data, req) => {
+		var passwordIsCorrect = data.passwordAttempt === serverData.roomList[data.RID].password;
+		const packet = {
+			"responseType": "passwordCheckResult",
+			"correct": passwordIsCorrect,
+			"RID": (passwordIsCorrect) ? data.RID : -1
+		}
+
+		req.ws.send(JSON.stringify(packet));
+	});
+
+	requestHandler.on("kickPlayer", (data, req) => {
+		removeUser(data.RID, getUserIndex(data.UID));
+		const packet = {
+			"responseType": "kick"
+		};
+		serverData.userWebSockets[data.UID].send(JSON.stringify(packet));
+	});
+
+	requestHandler.on("updateUserPointerColor", (data, req) => {
+		serverData.roomList[data.RID].userList[getUserIndex(data.UID)].pointerColor = data.pointerColor;
+		updateRoom(data.RID);
 	});
 	
 	return requestHandler;

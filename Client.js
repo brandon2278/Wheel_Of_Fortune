@@ -1,5 +1,23 @@
 let ws = new WebSocket("ws://127.0.0.1:8010");
 
+setTimeout(() => {
+	if(ws.readyState !== 1) {
+		swal({
+			title: "Can't Connect To Server. Try Agian Later.",            
+			button: {
+                		text: "ok",
+                		value: true,
+                		visible: true,
+                		className: "btn btn-warning",
+                		closeModal: true,
+            		},
+			timer: 10000
+		}).then(() => {
+			document.location.href = "index.php";
+		});
+	}
+}, 3000);
+
 var user = {
 	"Name": "Tester",
 	"UID" : -1,
@@ -8,7 +26,8 @@ var user = {
 	"isReady": false,
 	"mouseX": 0,
 	"mouseY": 0,
-	"inGame": false
+	"inGame": false,
+	"pointerColor": "red"
 }
 
 var roomList;
@@ -29,15 +48,66 @@ serverCallbacks.addEventListener("updateRoom", (e) => {
 	updateRoom(data);
 });
 
+serverCallbacks.addEventListener("passwordCheckResult", (e) => {
+	const data = e.detail;
+	if (data.correct) document.location.href = "Lobby.php?RID=" + data.RID;
+	else displayIncorrectPasswordMessage();
+});
+
+serverCallbacks.addEventListener("kick", (e) => {
+	swal({
+		title: "You Were Kicked From The Lobby",            
+		button: {
+                	text: "ok",
+                	value: true,
+                	visible: true,
+                	className: "btn btn-warning",
+                	closeModal: true,
+            	},
+		timer: 10000
+	}).then(() => {
+		document.location.href = "SelectLobby.php";
+	});
+});
+
+function updateUser() {
+	currentRoom.userList.forEach(u => {
+		if (u.UID === user.UID) {
+			user = u;
+		}
+	});
+}
+
+function displayIncorrectPasswordMessage() {
+	swal({
+		title: "You Entered An Incorrect Password. Try To Rejoin.",
+		timer: 3000,
+		buttons: false
+	})
+}
+
+function displayPasswordCreation() {
+	var pwd = document.getElementById("create-password");
+	if (pwd.style.display === "none") pwd.style.display = "block";
+	else pwd.style.display = "none";
+}
+
 function displayMessages(id) {
 	var chatWindow = document.getElementById(id);
 	chatWindow.innerHTML = "";
 	if(currentRoom.messages !== undefined) {
 		currentRoom.messages.reverse().forEach(m => {
 			var messageElement = document.createElement("p");
-			messageElement.innerHTML = m.userName + ": " + m.message;
+			var nameElement = document.createElement("span");
+			var textElement = document.createElement("span");
+			nameElement.innerHTML = m.userName;
+			textElement.innerHTML = ": " + m.message;
+			messageElement.appendChild(nameElement);
+			messageElement.appendChild(textElement);
 			if (m.userName === "Server") {
 				messageElement.style.color = "red";
+			} else {
+				nameElement.style.color = m.color;
 			}
 			chatWindow.appendChild(messageElement);
 		});
@@ -114,6 +184,8 @@ function createRoom(roomData) {
 		"loss": parseFloat(roomData.loss),
 		"vowelPrice": parseInt(roomData.vowelPrice),
 		"user": user,
+		"password": roomData.password,
+		"hasPassword": roomData.hasPassword,
 		"status": "Waiting"
 	};
 	ws.send(JSON.stringify(packet));
@@ -128,7 +200,8 @@ function createGame() {
 	var score = document.getElementById("create-game-round-reward").value;
 	var loss = document.getElementById("create-game-bankrupt-multiplier").value;
 	var vowelPrice = document.getElementById("create-game-vowel-price").value;
-
+	var pwd = document.getElementById("create-game-password").value;
+	var hasPwd = pwd !== "";
 	const roomData = {
 		"Name": name,
 		"playerCount": playerCount,
@@ -136,7 +209,9 @@ function createGame() {
 		"numPuzzles": numPuzzles,
 		"score": score,
 		"loss": loss,
-		"vowelPrice": vowelPrice
+		"vowelPrice": vowelPrice,
+		"password": pwd,
+		"hasPassword": hasPwd
 	};
 
 	createRoom(roomData);
@@ -145,6 +220,30 @@ function createGame() {
 function closeCreateGame() {
 	var createLobby = document.getElementById("create-lobby");
 	createLobby.style.visibility = "hidden";
+}
+
+function enterRoomPassword(RID) {
+	swal({
+		title: "Enter Lobby's Password",
+		content: {
+			element: "input"
+		},
+		button: {
+			text: "Submit",
+			value: true,
+			visible: true,
+			className: "btn btn-warning",
+			closeModal: true
+		}
+	}).then((value) => {
+		const packet = {
+			"requestType": "checkLobbyPassword",
+			"RID": RID,
+			"passwordAttempt": value
+		};
+
+		ws.send(JSON.stringify(packet));
+	});
 }
 
 function displayRooms() {
@@ -207,7 +306,8 @@ function displayRooms() {
 		lobbyRow.onclick = (e) => {
 			const RID = key;
 			if(roomList[RID].status === "Waiting" && roomList[key].userList.length < roomList[key].maxPlayerCount) {
-				document.location.href = "Lobby.php?RID=" + RID;
+				if (roomList[RID].hasPassword === false) document.location.href = "Lobby.php?RID=" + RID;
+				else enterRoomPassword(RID);
 			}
 		};
 

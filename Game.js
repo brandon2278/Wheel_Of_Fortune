@@ -183,7 +183,7 @@ function displayUsersMouse() {
 			var nameTag = document.createElement("div");
 			nameTag.innerHTML = u.Name;
 			nameTag.style.margin = "15px";
-			nameTag.style.color = "#FF0000";
+			nameTag.style.color = u.pointerColor;
 			mousePointer.appendChild(nameTag);
 			document.getElementById("game-body").appendChild(mousePointer);
 		}
@@ -193,7 +193,7 @@ function displayUsersMouse() {
 		} else {
 			visible = "hidden";
 		}
-		mousePointer.style = "visibility: " + visible + "; margin-left: auto; margin-right: 0; pointer-events: none; position: absolute; left: " + mouseX + "px; top: " + mouseY + "px;";
+		mousePointer.style = "background-color: " + u.pointerColor + "; visibility: " + visible + "; margin-left: auto; margin-right: 0; pointer-events: none; position: absolute; left: " + mouseX + "px; top: " + mouseY + "px;";
 	});
 }
 
@@ -476,6 +476,7 @@ function updateRoom(data) {
 		buyVowelButton.style.removeProperty('background');
 	}
 
+	updateUser();
 	lettersVisibility();
 	optionsVisibility();
 	removeUsedLetters();

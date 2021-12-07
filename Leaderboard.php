@@ -1,5 +1,45 @@
 <?php session_start();?>
 <!DOCTYPE html>
+<?php
+
+	/*
+	 *
+	 * Author(s): Colby O'Keefe (A00428974)
+	 */
+	function displayLeaderboard($users) {			
+		while($row = $users->fetch_assoc()) {
+			$winRatio = $row['matchesWon'];
+			if ($row['matchesLose'] != 0) {
+				$winRatio = $winRatio / $row['matchesLose'];
+			}
+			echo "<tr style=\"font-size: 1em; color: white; text-align: center\">";
+			echo "<td>" . $row["username"] . "</td>";
+			echo "<td>$" . $row["score"] . "</td>";
+			echo "<td>$" . $row["highscore"] . "</td>";
+			echo "<td>" . $winRatio . "</td>";
+			echo "</tr>";
+		}
+	}
+	
+	/*
+	 *
+	 * Author(s): Colby O'Keefe (A00428974)
+	 */
+	function getUserData() {
+		require "./includes/db.php";
+		$conn = new mysqli($serverName, $dbUsername, $dbPassword, $dbName);
+		if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+
+		$result = $conn->query("SELECT * FROM users ORDER BY highScore DESC");
+
+		mysqli_close($conn);
+
+		return $result;
+
+	}
+?>
 <html lang="en">
 	<head>
 	    <meta charset="UTF-8">
@@ -24,25 +64,13 @@
 			<tbody>
 			<tr style="text-decoration: underline; text-align: center">;
 				<td>Username</td>
-				<td>High Score</td>
+				<td>Single-Player Score</td>
+				<td>Mutli-Player Highscore</td>
+				<td>Mutli-Player Win-Lose Ratio</td>
 			</tr>	
 				<?php
-					require "./includes/db.php";
-					$conn = new mysqli($serverName, $dbUsername, $dbPassword, $dbName);
-					if ($conn->connect_error) {
-						die("Connection failed: " . $conn->connect_error);
-					}
-
-					$result = $conn->query("SELECT username, highScore FROM users ORDER BY highScore DESC");
-					
-					while($row = $result->fetch_assoc()) {
-						echo "<tr style=\"font-size: 1em; color: white; text-align: center\">";
-						echo "<td>" . $row["username"] . "</td>";
-						echo "<td>" . $row["highScore"] . "</td>";
-						echo "</tr>";
-					}
-
-					mysqli_close($conn);
+					$userData = getUserData();
+					displayLeaderboard($userData);
 				?>
 			</tbody>
 			</table>

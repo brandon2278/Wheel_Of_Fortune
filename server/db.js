@@ -40,6 +40,30 @@ module.exports = {
 				resolve(res);
 			});
 		});
+	},
+
+	"updateStats": async (userList, winnerUID) => {
+
+		userList.forEach(async (user) => {
+			await conn.query("SELECT * FROM users WHERE id=" + user.UID, async (err, res) => {
+				var sql = "UPDATE users SET ";
+				if (res[0].highscore < user.score) {
+					// Update highscore 
+					sql += "highscore = " + user.score + ",";  
+				}
+
+				if (user.UID === winnerUID) {
+					sql += "matchesWon = " + (res[0].matchesWon + 1)
+				} else {
+					sql += "matchesLose = " + (res[0].matchesLose + 1)
+				}
+
+				sql += " WHERE id = " + user.UID + ";";
+
+				await conn.query(sql, (err, res) => {
+				});
+			});
+		});
 	}
 };
 

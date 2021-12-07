@@ -14,10 +14,25 @@
 		 "score": 0,
 		 "mouseX": 0,
 		 "mouseY": 0,
-		 "inGame": false
+		 "inGame": false,
+		 "pointerColor": "red"
                 }
         }
     </script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <style>
+	.swal-overlay {
+		z-index: 1;
+	}
+        .swal-modal {
+            background-color: rgba(72, 21, 131, 0.9);
+	    border: none;
+        }
+
+        .swal-title {
+            color: rgb(255, 223, 79);
+        }
+    </style>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -76,6 +91,16 @@
                                     <div class="form-outline mb-4">
                                         <label class="form-label" for="picture">Vowel Price</label>
                                         <input id = "create-game-vowel-price" type="number" step= "1" value = "250" class="form-control form-control-lg">
+				    </div>
+
+				    <div class="form-outline-mb-4"> 
+				    <label class="form-label" for="picture">Password</label>
+				    <input id="create-game-has-password" type="checkbox" onchange="displayPasswordCreation()"></input>
+				    </div>
+
+                                    <div class="form-outline mb-4" id="create-password" style="display: none;">
+                                        <label class="form-label" for="word">Lobby Password</label>
+                                        <input id = "create-game-password" type="text" value = "" class="useLobbyKeyboard form-control form-control-lg">
                                     </div>
 
                                     <button onclick = "createGame()" class="btn btn-warning" style="font-family:fortune;">Create</button>

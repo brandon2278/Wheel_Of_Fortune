@@ -14,7 +14,8 @@
 		 "score": 0,
 		 "mouseX": 0,
 		 "mouseY": 0,
-		 "inGame": false
+		 "inGame": false,
+		 "pointerColor": "red"
                 }
         }
     </script>

@@ -14,7 +14,8 @@
 		 "madeMove": false,
 		 "mouseX": 0,
 		 "mouseY": 0,
-		 "inGame": true
+		 "inGame": true,
+		 "pointerColor": "red"
              }
         }
     </script>

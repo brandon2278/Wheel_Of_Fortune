@@ -23,7 +23,8 @@ function formatRoom(room) {
 		"maxPlayerCount": room.maxPlayerCount,
 		"status": room.status,
 		"hasVowel": room.hasVowel,
-		"vowelPrice": room.vowelPrice
+		"vowelPrice": room.vowelPrice,
+		"hasPassword": room.hasPassword
 	};
 }
 

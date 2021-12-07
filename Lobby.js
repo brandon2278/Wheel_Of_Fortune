@@ -53,6 +53,7 @@ function updateRoom(data) {
 	displayMessages("chat-window");
 	displayUsers();
 	displayOptions();
+	updateUser();
 }
 
 function displayOptions() {
@@ -73,20 +74,87 @@ function reconnect() {
 	document.location.href = "Game.php?RID=" + RID;
 }
 
+function kickPlayer(UID) {
+	const packet = {
+		"requestType": "kickPlayer",
+		"RID": RID,
+		"UID": UID
+	};
+
+	ws.send(JSON.stringify(packet));
+}
+
+function setPointerColor() {
+	swal({
+		title: "Choose Your Pointer Color",
+		content: {
+			element: "input",
+			attributes: {
+				type: "color",
+				style: "height: 100px;"
+			}
+		},
+		button: {
+			text: "Submit",
+			value: true,
+			visible: true,
+			className: "btn btn-warning",
+			closeModal: true
+		}
+	}).then((color) => {
+		const packet = {
+			"requestType": "updateUserPointerColor",
+			"RID": RID,
+			"UID": user.UID,
+			"pointerColor": color
+		};
+
+		ws.send(JSON.stringify(packet));
+	});
+}
+
 function displayUsers() {
+	var me = user;
 	var lobbyContainer = document.getElementById("user-list");
 	lobbyContainer.innerHTML = '';
 	const currentRID = document.location.href.split("=")[1];
 	for(const user of currentRoom.userList) {
 		var lobbyElement = document.createElement("li");
+		lobbyElement.style.display = "inline-block";
+
 		var aElement = document.createElement("a");
-		if (user.isLeader) aElement.style.color = "yellow";
-		else if(user.isReady) aElement.style.color = "#22FF22";
 		aElement.className = "btn btn-dark";
 		aElement.setAttribute("role", "button");
 		aElement.style.fontSize = "2em";
 		aElement.innerHTML = user.Name;
+		
+		var pointerColor = document.createElement("span");
+		pointerColor.innerHTML = "&#8226;";
+		pointerColor.style.color = user.pointerColor;
+		pointerColor.style.position = "relative";
+		pointerColor.style.top = "-20px";
+		pointerColor.style.right = "-10px";
+		aElement.append(pointerColor);
+
+		if(user.UID === me.UID) {
+			aElement.onclick = (e) => {
+				setPointerColor();
+			};
+		}
+		if (user.isLeader) aElement.style.color = "yellow";
+		else if(user.isReady) aElement.style.color = "#22FF22";
 		lobbyElement.appendChild(aElement);
+		if (me.isLeader && !user.isLeader) {
+			var kickBtn = document.createElement("a");
+			kickBtn.className = "btn btn-dark";
+			kickBtn.innerHTML = "Kick";
+			kickBtn.style.marginLeft = "15px";
+			kickBtn.style.fontSize = "2em";
+			kickBtn.onclick = (e) => {
+				kickPlayer(user.UID);
+			};
+			lobbyElement.appendChild(kickBtn);
+		}
 		lobbyContainer.appendChild(lobbyElement);
 	}
 }

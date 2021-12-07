@@ -235,6 +235,7 @@ async function updateGame(RID, oldPlayerIndex) {
 	if(currentRound === maxRound && currentPuzzle === maxPuzzle) {
 		endMatch(RID);
 		var winner = findUserWithHigestScore(RID);
+		await db.updateStats(serverData.roomList[RID].userList, winner.UID);
 		communicate.emitToRoom(RID, {
 			"responseType": "endMatch",
 			"room": communicate.formatRoom(serverData.roomList[RID]),
