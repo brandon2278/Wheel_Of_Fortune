@@ -398,16 +398,19 @@ tr.container1 {
   width: 100%;
   font-size: 2em;
   margin: 25px;
+  table-layout: fixed
 }
 
 #lobby-table tr {
-  height: 100px;
   vertical-align: top;
 }
 
 #lobby-table td {
-  height: 100px;
   vertical-align: top;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  padding-bottom: 10px;
 }
 
 /* Phrases Section */
@@ -749,18 +752,51 @@ input {
 	right: 100px;
 }
 
-#back-button {
-	font-size: 2em;
-	margin-left: 20px;
+#lobby-button {
+	font-size: 2vw;
+	margin-top: 20px;
+	align: center;
 }
 
 #lobby-header {
 	text-decoration: underline overline;
 	text-align: center;
-	height: 10px;
+	font-size: 2vw;
+}
+
+#lobby-section {
+	text-align: center;
 }
 
 .lobby-entry {
-	font-size: 1em;
+	font-size: 1.5vw;
 	text-align: center;
+	background-color: rgba(0, 0, 0, 0.5);
+	border: solid thin rgba(255, 255, 255, 0.5);
+}
+
+.swal-overlay {
+	z-index: 1;
+}
+
+.swal-modal {
+	background-color: rgba(72, 21, 131, 0.9);
+	border: none;
+}
+
+.swal-title {
+	color: rgb(255, 223, 79);
+}
+
+.card {
+	max-height: 80vh;
+	overflow-y: scroll;
+}
+
+input[type='checkbox'] {
+    width:20px;
+    height:20px;
+    background:white;
+    border-radius:5px;
+    border:2px solid #555;
 }

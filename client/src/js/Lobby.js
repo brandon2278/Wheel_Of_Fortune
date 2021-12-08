@@ -9,6 +9,22 @@ window.onload = () => {
 	}); 
 }
 
+serverCallbacks.addEventListener("kick", (e) => {
+	swal({
+		title: "You Were Kicked From The Lobby",            
+		button: {
+					text: "ok",
+					value: true,
+					visible: true,
+					className: "btn btn-warning",
+					closeModal: true,
+				},
+		timer: 10000
+	}).then(() => {
+		document.location.href = "../";
+	});
+});
+
 serverCallbacks.addEventListener("getRoom", (e) => {
 	console.log("Fetching Room")
 	const data = e.detail;
@@ -37,6 +53,16 @@ serverCallbacks.addEventListener("startCountdown", async (e) => {
 	}
 	ws.send(JSON.stringify(packet));
 });
+
+function leaveRoom() {
+	const packet = {
+		"requestType": "exitRoom",
+		"RID": RID,
+		"user": user
+	}
+	ws.send(JSON.stringify(packet));
+	document.location.href = "../";
+}
 
 function updateRoom(data) {
 	var me = data.room.userList.find(u => u.UID === user.UID);

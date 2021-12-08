@@ -74,7 +74,7 @@ function clearRooms() {
 			}
 		});
 		if (serverData.roomList[key].userList.length === 0) {
-			communicate.emitToRoom(RID, {
+			communicate.emitToRoom(key, {
 				"responseType": "removeLobby",
 				"RID": key
 			});

@@ -4,35 +4,22 @@
 
 <head>
 	<script>
-	function getUserInfomation() {
+		function getUserInfomation() {
 			 return {
-				 "Name": <?php echo '"'.$_SESSION['userId'].'"'; ?>,
-		 "UID" : <?php echo '"'.$_SESSION['Id'].'"'; ?>,
-		 "closeTime": -1,
-		 "isLeader": false,
-		 "isReady": false,
-		 "score": 0,
-		 "mouseX": 0,
-		 "mouseY": 0,
-		 "inGame": false,
-		 "pointerColor": "red"
-				}
+				"Name": <?php echo '"'.$_SESSION['userId'].'"'; ?>,
+				"UID" : <?php echo '"'.$_SESSION['Id'].'"'; ?>,
+				"closeTime": -1,
+				"isLeader": false,
+				"isReady": false,
+				"score": 0,
+				"mouseX": 0,
+				"mouseY": 0,
+				"inGame": false,
+				"pointerColor": "red"
+			}
 		}
 	</script>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-	<style>
-	.swal-overlay {
-		z-index: 1;
-	}
-		.swal-modal {
-			background-color: rgba(72, 21, 131, 0.9);
-		border: none;
-		}
-
-		.swal-title {
-			color: rgb(255, 223, 79);
-		}
-	</style>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,9 +35,7 @@
 </head>
 
 <body align="center">
-	<a class="btn btn-dark" id="back-button" href="../" role="button">Back</a>
-	<a class="btn btn-dark" id="back-button" onclick="createLobby.style.visibility = 'visible';" role="button">Create Lobby</a>
-
+ <h2 align="center">Wheel Of FOrtune Mutiplayer</h2>
  <section align="center" id="create-lobby" style = "position: fixed; width: 100vw; height: 60vh;">
 		<div class="mask d-flex align-items-center h-100 gradient-custom-3">
 			<div class="container h-100">
@@ -130,6 +115,10 @@
 
 		</table>
 	</div>
+	<center>
+		<a class="btn btn-dark" id="lobby-button" href="../" role="button">Back</a>
+		<a class="btn btn-dark" id="lobby-button" onclick="document.getElementById('create-lobby').style.visibility = 'visible';" role="button">Create Lobby</a>
+	</center>
 </body>    
 <script src ="../src/js/Client.js"></script>
 <script src="../src/js/SelectLobby.js"></script>

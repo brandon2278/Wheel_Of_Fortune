@@ -1,5 +1,38 @@
+/* 
+ * This file starts a Serure WebSocet connection to the NodeJS server 
+ * and then sets up an event system for the NodeJS server to communicate 
+ * to the user. Some general client functions are also stored in the file.
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
+
+// Time interval in ms to check if the user is still connected to the server 
+const SERVER_TIMEOUT = 3000
+
+// Opens a new connection to the NodeJS server  
 let ws = new WebSocket("ws://127.0.0.1:8010");
 
+// Variables to store the users current room structure and it's ID
+var currentRoom = null;
+const RID = document.location.href.split("=")[1];
+
+// Defines a default user struct
+var user = {
+	"Name": "Tester",	// Stores the users username
+	"UID" : -1,		// Stores the users UID
+	"closeTime": -1,	// Stores the time since the user lost connect to the server
+	"isLeader": false,	// Stores if the user is the leader of the lobby
+	"isReady": false,	// Stores if the user has readied up or not
+	"mouseX": 0,		// Stores the users mouse x position
+	"mouseY": 0,		// Stores the user mouse y position
+	"inGame": false,	// Stores if the user is in a game or not
+	"pointerColor": "red"	// Stores the color of the user mouse pointer
+}
+
+/*
+ * This function checks if the WebSocket connection has been lost and
+ * if so alerts the user and then returns them to the main menu.
+ */
 setTimeout(() => {
 	if(ws.readyState !== 1) {
 		swal({
@@ -16,60 +49,45 @@ setTimeout(() => {
 			document.location.href = "../";
 		});
 	}
-}, 3000);
+}, SERVER_TIMEOUT);
 
-var user = {
-	"Name": "Tester",
-	"UID" : -1,
-	"closeTime": -1,
-	"isLeader": false,
-	"isReady": false,
-	"mouseX": 0,
-	"mouseY": 0,
-	"inGame": false,
-	"pointerColor": "red"
-}
-
-var roomList;
-
-var currentRoom = null;
-const RID = document.location.href.split("=")[1];
-
+// declares a new EventTarget that the server will use to
+// communicate with the user.
 var serverCallbacks = new EventTarget(); 
 
-serverCallbacks.addEventListener("updateRoomList", (e) => {
-	const data = e.detail;
-	roomList = data.roomList;
-	displayRooms();
-});
-
+/*
+ * Listener for a request from the server to update room infomation.
+ */
 serverCallbacks.addEventListener("updateRoom", (e) => {
 	const data = e.detail;
+	// Different definitions depend on what page the user is located
+	// refer to Lobby.js and Game.js for the definitions.
 	updateRoom(data);
 });
 
-serverCallbacks.addEventListener("passwordCheckResult", (e) => {
-	const data = e.detail;
-	if (data.correct) document.location.href = "./lobby/?RID=" + data.RID;
-	else displayIncorrectPasswordMessage();
-});
+/*
+ * This function send a request to the server for the user to join
+ * a room.
+ * 
+ * @param RID The room ID the user is joining
+ * @author Colby O'Keefe (A00428974)
+ */
+function joinRoom(RID) {
+	const packet = {
+		"requestType": "joinRoom",
+		"RID": RID,
+		"user": user
+	};
+	ws.send(JSON.stringify(packet));
+}
 
-serverCallbacks.addEventListener("kick", (e) => {
-	swal({
-		title: "You Were Kicked From The Lobby",            
-		button: {
-					text: "ok",
-					value: true,
-					visible: true,
-					className: "btn btn-warning",
-					closeModal: true,
-				},
-		timer: 10000
-	}).then(() => {
-		document.location.href = "../";
-	});
-});
-
+/*
+ * This routine finds the user in the current room's user list
+ * and updates the user infomation. This function is called 
+ * upon a room update request.
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
 function updateUser() {
 	currentRoom.userList.forEach(u => {
 		if (u.UID === user.UID) {
@@ -78,42 +96,54 @@ function updateUser() {
 	});
 }
 
-function displayIncorrectPasswordMessage() {
-	swal({
-		title: "You Entered An Incorrect Password. Try To Rejoin.",
-		timer: 3000,
-		buttons: false
-	})
-}
 
-function displayPasswordCreation() {
-	var pwd = document.getElementById("create-password");
-	if (pwd.style.display === "none") pwd.style.display = "block";
-	else pwd.style.display = "none";
-}
-
+/*
+ * This routine display all messages sent in a room to a HTML element 
+ * identified by the id parameter.
+ *
+ * @param id The HTML element id where the message will appended as a child to
+ * @author Colby O'Keefe (A00428974)
+ */
 function displayMessages(id) {
+	// Finds the chat window from it's id and then clear all old messages
 	var chatWindow = document.getElementById(id);
 	chatWindow.innerHTML = "";
+	
+	// Check if the room has any messges sent
 	if(currentRoom.messages !== undefined) {
+		// Loops through the messages starting from the most recent
 		currentRoom.messages.reverse().forEach(m => {
+			// Creates the message HTML element
 			var messageElement = document.createElement("p");
 			var nameElement = document.createElement("span");
 			var textElement = document.createElement("span");
+			// Sets the innerHTML to the users name and their message
 			nameElement.innerHTML = m.userName;
 			textElement.innerHTML = ": " + m.message;
+			// Appends name and text to parnet message
 			messageElement.appendChild(nameElement);
 			messageElement.appendChild(textElement);
+			// Checks if message is sent from the server and if so
+			// color the message and name red
 			if (m.userName === "Server") {
 				messageElement.style.color = "red";
 			} else {
+				// colors the users name their current choosen color
 				nameElement.style.color = m.color;
 			}
+				
+			// appends message to the chat window
 			chatWindow.appendChild(messageElement);
 		});
 	}
 }
 
+/*
+ * The routine sends a message from the user to the server.
+ * 
+ * @param text message sent by the user 
+ * @author Colby O'Keefe (A00428974)
+ */
 function sendMessage(text) {
 	const packet = {
 		"requestType": "sendMessage",
@@ -124,6 +154,15 @@ function sendMessage(text) {
 	ws.send(JSON.stringify(packet));
 }
 
+/*
+ * This routine display a countdown from 3 using sweet alert boxes and then
+ * displays a final message.
+ * 
+ * @param message message to display once the countdown has ended
+ * @param time The time in ms for each popup to display for
+ * @return A Promise object
+ * @author Colby O'Keefe (A00428974)
+ */
 async function countdown(time, message) {
 	return await new Promise((res, rej) => {
 		swal({
@@ -152,157 +191,10 @@ async function countdown(time, message) {
 	});
 }
 
-function leaveRoom() {
-	const packet = {
-		"requestType": "exitRoom",
-		"RID": RID,
-		"user": user
-	}
-	ws.send(JSON.stringify(packet));
-	document.location.href = "../";
-}
-
-function joinRoom(RID) {
-	const packet = {
-		"requestType": "joinRoom",
-		"RID": RID,
-		"user": user
-	};
-	ws.send(JSON.stringify(packet));
-}
-
-function createRoom(roomData) {
-	const RID = Math.random().toString();
-	const packet = {
-		"requestType": "createRoom",
-		"roomName": roomData.Name,
-		"RID": RID,
-		"playerCount": parseInt(roomData.playerCount),
-		"numRounds": parseInt(roomData.numRounds),
-		"numPuzzles": parseInt(roomData.numPuzzles),
-		"score": parseInt(roomData.score),
-		"loss": parseFloat(roomData.loss),
-		"vowelPrice": parseInt(roomData.vowelPrice),
-		"user": user,
-		"password": roomData.password,
-		"hasPassword": roomData.hasPassword,
-		"status": "Waiting"
-	};
-	ws.send(JSON.stringify(packet));
-	document.location.href = "./lobby/?RID=" + RID;
-}
-
-function createGame() {
-	var name = document.getElementById("create-game-name").value;
-	var playerCount = document.getElementById("create-game-player-count").value;
-	var numRounds = document.getElementById("create-game-round-count").value;
-	var numPuzzles = document.getElementById("create-game-puzzle-count").value;
-	var score = document.getElementById("create-game-round-reward").value;
-	var loss = document.getElementById("create-game-bankrupt-multiplier").value;
-	var vowelPrice = document.getElementById("create-game-vowel-price").value;
-	var pwd = document.getElementById("create-game-password").value;
-	var hasPwd = pwd !== "";
-	const roomData = {
-		"Name": name,
-		"playerCount": playerCount,
-		"numRounds": numRounds,
-		"numPuzzles": numPuzzles,
-		"score": score,
-		"loss": loss,
-		"vowelPrice": vowelPrice,
-		"password": pwd,
-		"hasPassword": hasPwd
-	};
-
-	createRoom(roomData);
-}
-
-function closeCreateGame() {
-	var createLobby = document.getElementById("create-lobby");
-	createLobby.style.visibility = "hidden";
-}
-
-function enterRoomPassword(RID) {
-	swal({
-		title: "Enter Lobby's Password",
-		content: {
-			element: "input"
-		},
-		button: {
-			text: "Submit",
-			value: true,
-			visible: true,
-			className: "btn btn-warning",
-			closeModal: true
-		}
-	}).then((value) => {
-		const packet = {
-			"requestType": "checkLobbyPassword",
-			"RID": RID,
-			"passwordAttempt": value
-		};
-
-		ws.send(JSON.stringify(packet));
-	});
-}
-
-function joinLobby(RID) {
-	if(roomList[RID].status === "Waiting" && roomList[RID].userList.length < roomList[RID].maxPlayerCount) {
-		if (roomList[RID].hasPassword === false) document.location.href = "./lobby/?RID=" + RID;
-		else enterRoomPassword(RID);
-	}
-}
-
-function displayRooms() {
-	var lobbyTable = document.getElementById("lobby-section");
-	lobbyTable.innerHTML = "";
-	for(let key in roomList) {
-		var lobbyRow = document.createElement("tr");
-		lobbyRow.classList.add("lobby-entry");
-
-		if(roomList[key].status === "Waiting" && roomList[key].userList.length < roomList[key].maxPlayerCount) {
-			lobbyRow.style.color = "white";
-		} else {
-			lobbyRow.style.color = "grey";
-		}
-
-		lobbyRow.onclick = () => joinLobby(key);
-
-		var lobbyName = document.createElement("td");
-		var lobbyCount = document.createElement("td");
-		var lobbyLeader = document.createElement("td");
-		var lobbyStatus = document.createElement("td");
-		var lobbyHasPassword = document.createElement("td");
-
-		lobbyName.innerHTML = roomList[key].roomName;
-
-		lobbyCount.innerHTML = roomList[key].userList.length + "/" + roomList[key].maxPlayerCount;
-
-		var leader = null;
-		roomList[key].userList.forEach(u => {
-			if(u.isLeader) {
-				leader = u.Name;
-			}
-		});
-
-		lobbyLeader.innerHTML = leader;
-
-		lobbyStatus.innerHTML = roomList[key].status;
-		
-		lobbyHasPassword.innerHTML = (roomList[key].hasPassword) ? "Yes" : "No"
-
-		lobbyRow.appendChild(lobbyName);
-		lobbyRow.appendChild(lobbyCount);
-		lobbyRow.appendChild(lobbyLeader);
-		lobbyRow.appendChild(lobbyStatus);
-		lobbyRow.appendChild(lobbyHasPassword);
-		lobbyTable.appendChild(lobbyRow);
-	}
-}
-
-
+// Listnes for messages from the server
 ws.onmessage = (e) => {
 	const data = JSON.parse(e.data);
+	// sends the servers message to the callback system
 	serverCallbacks.dispatchEvent(new CustomEvent(data.responseType, {"detail": data}));
 
 };
