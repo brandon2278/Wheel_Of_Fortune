@@ -391,13 +391,13 @@ tr.container1 {
   overflow-y: scroll;
   display: flex;
   margin: auto;
+  margin-top: 20px;
 }
 
 #lobby-table {
   width: 100%;
-  height: 100%;
   font-size: 2em;
-  margin: 20px;
+  margin: 25px;
 }
 
 #lobby-table tr {
@@ -747,4 +747,20 @@ input {
 #game-settings {
 	position: absolute;
 	right: 100px;
+}
+
+#back-button {
+	font-size: 2em;
+	margin-left: 20px;
+}
+
+#lobby-header {
+	text-decoration: underline overline;
+	text-align: center;
+	height: 10px;
+}
+
+.lobby-entry {
+	font-size: 1em;
+	text-align: center;
 }
