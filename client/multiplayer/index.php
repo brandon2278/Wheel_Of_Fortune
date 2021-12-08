@@ -1,24 +1,8 @@
-<?php session_start();?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-	<script>
-		function getUserInfomation() {
-			 return {
-				"Name": <?php echo '"'.$_SESSION['userId'].'"'; ?>,
-				"UID" : <?php echo '"'.$_SESSION['Id'].'"'; ?>,
-				"closeTime": -1,
-				"isLeader": false,
-				"isReady": false,
-				"score": 0,
-				"mouseX": 0,
-				"mouseY": 0,
-				"inGame": false,
-				"pointerColor": "red"
-			}
-		}
-	</script>
+	<?php include "../src/php/getUser.php" ?>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -35,7 +19,7 @@
 </head>
 
 <body align="center">
- <h2 align="center">Wheel Of FOrtune Mutiplayer</h2>
+ <h2 align="center" style="font-size: 4vh;">Wheel Of FOrtune Mutiplayer</h2>
  <section align="center" id="create-lobby" style = "position: fixed; width: 100vw; height: 60vh;">
 		<div class="mask d-flex align-items-center h-100 gradient-custom-3">
 			<div class="container h-100">

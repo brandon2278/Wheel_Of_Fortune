@@ -139,28 +139,40 @@ function setPointerColor() {
 	});
 }
 
+function askToKick(username, UID) {
+	swal({
+		title: "Do You Want To Kick " + username + "?",
+		showCancelButton: true,
+		buttons: [
+			"No",
+			"Yes"
+		],
+		dangerMode: true
+	}).then((isConfirmed) => {
+		if (isConfirmed) kickPlayer(UID);
+	});
+}
+
 function displayUsers() {
 	var me = user;
 	var lobbyContainer = document.getElementById("user-list");
 	lobbyContainer.innerHTML = '';
 	const currentRID = document.location.href.split("=")[1];
 	for(const user of currentRoom.userList) {
-		var lobbyElement = document.createElement("li");
-		lobbyElement.style.display = "inline-block";
+		var lobbyElement = document.createElement("center");
+		lobbyElement.className = "lobby-user-container";
 
 		var aElement = document.createElement("a");
-		aElement.className = "btn btn-dark";
+		aElement.className = "btn btn-dark lobby-user";
 		aElement.setAttribute("role", "button");
 		aElement.style.fontSize = "2em";
 		aElement.innerHTML = user.Name;
 		
 		var pointerColor = document.createElement("span");
-		pointerColor.innerHTML = "&#8226;";
 		pointerColor.style.color = user.pointerColor;
-		pointerColor.style.position = "relative";
-		pointerColor.style.top = "-20px";
-		pointerColor.style.right = "-10px";
-		aElement.append(pointerColor);
+		pointerColor.className = "user-color";
+		pointerColor.innerHTML = "&#8226;";
+		aElement.prepend(pointerColor);
 
 		if(user.UID === me.UID) {
 			aElement.onclick = (e) => {
@@ -171,15 +183,9 @@ function displayUsers() {
 		if(user.isReady) aElement.style.color = "#22FF22";
 		lobbyElement.appendChild(aElement);
 		if (me.isLeader && !user.isLeader) {
-			var kickBtn = document.createElement("a");
-			kickBtn.className = "btn btn-dark";
-			kickBtn.innerHTML = "Kick";
-			kickBtn.style.marginLeft = "15px";
-			kickBtn.style.fontSize = "2em";
-			kickBtn.onclick = (e) => {
-				kickPlayer(user.UID);
+			lobbyElement.onclick = (e) => {
+				askToKick(user.Name, user.UID);
 			};
-			lobbyElement.appendChild(kickBtn);
 		}
 		lobbyContainer.appendChild(lobbyElement);
 	}

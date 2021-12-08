@@ -47,18 +47,18 @@
 </head>
 
 <body align="center">
+	<h2 align="center" class="lobby-title" id = "room-name"></h2>
 
 	<div id = "lobby-content">
 		<div id = "user-list-container">
-		<h1 style="margin: 20px">User List</h1>
-			<ul class="list-unstyled" id = "user-list">
-				
-			</ul>
+			<h1 class="lobby-header">Users</h1>
+			<div class="list-unstyled" id = "user-list">
+			
+			</div>
 		</div>
 
 		<div id = "middle-container">
-			<h1 style="margin: auto;" id = "room-name"></h1>
-			<h1 style="margin: auto;" id = "player-count"></h1>
+			<h1 id = "player-count"></h1>
 			<div id = "chat-container">
 				<div id = "chat-window">
 				</div>
@@ -68,16 +68,12 @@
 			</div>
 
 			<div id = "control-container" align = "center">    
-				<button onclick="readyUp()" class="btn btn-dark" style="font-size: 2em;" id="ready-up">Ready Up</button>
-				<button onclick="forceStart()" class="btn btn-dark" style = "display: none; font-size: 2em;" id="force-start">Force Start</button>
-				<button onclick="leaveRoom()" class="btn btn-dark" style="font-size: 2em" id="leave-room">Leave Room</button>
-				<button onclick="reconnect()" class="btn btn-dark" style="font-size: 2em" id="reconnect">Reconnect</button>
+				<button onclick="readyUp()" class="btn btn-dark lobby-button" id="ready-up">Ready Up</button>
+				<button onclick="forceStart()" class="btn btn-dark lobby-button" style = "display: none;" id="force-start">Force Start</button>
+				<button onclick="leaveRoom()" class="btn btn-dark lobby-button" id="leave-room">Leave Room</button>
+				<button onclick="reconnect()" class="btn btn-dark lobby-button" id="reconnect">Reconnect</button>
 			</div>
 		</div>
-
-		<div id = "game-info-container">
-			<h1 style="margin: 20px">Game Infomation</h1>
-		</div>    
 	</div>
 
 </body>    

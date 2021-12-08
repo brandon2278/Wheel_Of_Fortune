@@ -340,17 +340,18 @@ tr.container1 {
 }
 
 #user-list-container {
-  width: 20%;
+  width: 25%;
   height: 100%;
   display: block;
 }
 
 #middle-container {
-  width: 60%;
+  width: 75%;
   height: 100%;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  padding-right: 2vw;
 }
 #chat-container {
   width: 100%;
@@ -366,6 +367,8 @@ tr.container1 {
   flex-direction: column-reverse;
   align-items: flex-start;
   padding-left: 10px;
+  word-break: break-all;
+  font-size: 2vw;
 }
 
 #message-box {
@@ -791,6 +794,56 @@ input {
 .card {
 	max-height: 80vh;
 	overflow-y: scroll;
+}
+
+.lobby-header {
+	font-size: 2vh;
+        width: 100%;
+	margin-top: 4vh;	
+	text-align: center;
+}
+.lobby-title {
+	font-size: 4vh; 
+}
+
+#player-count {
+    text-align: center;
+    width: 100%;
+    top: 0;
+    font-size: 3vh;
+}
+
+.lobby-user {
+    margin-top: 1vh;
+    overflow-x: hidden;
+    width: 80%;
+    text-overflow: ellipsis;
+}
+
+.lobby-user-container{
+     	font-size: 1vw;
+	text-align: center;
+}
+
+.user-color {
+    position: relative;
+    left: -0.5vw;
+}
+
+.lobby-button {
+	display: inline-table;
+	font-size: 1.5vh;
+	margin-bottom: 0.5vh;
+	width: 50%;
+}
+
+@media screen and (max-width: 1024px) {
+    #SideBar {
+        display: none !important;
+    }
+    #ChatContainer {
+        width: 100%;
+    }
 }
 
 input[type='checkbox'] {
