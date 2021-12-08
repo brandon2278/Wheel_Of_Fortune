@@ -1,0 +1,66 @@
+let mySql = require('mysql')
+
+let pool = mySql.createPool( {
+	connectionLimit: 10,
+	host: 'sql5.freemysqlhosting.net',
+	user: 'sql5441723',
+	password: 'zkZfThlgHa',
+	database: 'sql5441723',
+	charset: 'latin1_swedish_ci'
+});
+
+module.exports = {
+	"getTables": async () => {
+		return await new Promise((resolve, reject) => {
+			pool.query("SHOW TABLES", (err, res) => {
+				console.log("Before: ", res);
+				res = res.filter((e) => (
+					e.Tables_in_sql5441723 != 'users' && 
+					e.Tables_in_sql5441723 != 'phraseID' && 
+					e.Tables_in_sql5441723 != 'securityTest' &&
+					e.Tables_in_sql5441723 != 'food' && 
+					e.Tables_in_sql5441723 != 'earth' && 
+					e.Tables_in_sql5441723 != 'greetings' && 
+					e.Tables_in_sql5441723 != 'numbers'  
+					/*e.Tables_in_sql5441723 == "phrases" ||
+					e.Tables_in_sql5441723 == "animals"*/
+				));
+				console.log("After: ", res);
+				resolve(res);
+			});
+		});
+	},
+
+	"getPuzzles": async (table) => {
+		return await new Promise((resolve, reject) => {
+			pool.query(`SELECT * FROM ${table}`, (err, res) => {
+				resolve(res);
+			});
+		});
+	},
+
+	"updateStats": async (userList, winnerUID) => {
+
+		userList.forEach(async (user) => {
+			await pool.query("SELECT * FROM users WHERE id=" + user.UID, async (err, res) => {
+				var sql = "UPDATE users SET ";
+				if (res[0].highscore < user.score) {
+					// Update highscore 
+					sql += "highscore = " + user.score + ",";  
+				}
+
+				if (user.UID === winnerUID) {
+					sql += "matchesWon = " + (res[0].matchesWon + 1)
+				} else {
+					sql += "matchesLose = " + (res[0].matchesLose + 1)
+				}
+
+				sql += " WHERE id = " + user.UID + ";";
+
+				await pool.query(sql, (err, res) => {
+				});
+			});
+		});
+	}
+};
+
