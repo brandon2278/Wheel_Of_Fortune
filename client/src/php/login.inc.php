@@ -1,3 +1,8 @@
+<!-- 
+	Database Connection for verifying logged in users!
+ 	@author Brandon Catwright (A00430851) 
+-->
+
 <?php
 
 if(isset($_POST['login-submit'])){

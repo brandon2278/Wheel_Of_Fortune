@@ -1,3 +1,8 @@
+<!-- 
+	Database Connection for adding new users!
+ 	@author Brandon Catwright (A00430851) 
+-->
+
 <?php
 
 if(isset($_POST['signup-submit'])){
