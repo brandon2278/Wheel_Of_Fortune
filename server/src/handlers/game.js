@@ -331,7 +331,7 @@ async function nextRound(RID) {
  * @author COlby O'Keefe (A00428974)
  */
 function endMatch(RID) {
-	serverData.roomList[RID].status = "Waiting";
+	if(serverData.roomList[RID].status !== "Hidden") serverData.roomList[RID].status = "Waiting";
 }
 
 /*
@@ -584,7 +584,7 @@ async function initGame(data) {
 	serverData.roomList[data.RID].currentRound = 1;
 	serverData.roomList[data.RID].currentPuzzleNumber = 1;
 	serverData.roomList[data.RID].lastKey = false;
-	serverData.roomList[data.RID].status = "In Game";
+	serverData.roomList[data.RID].status = (serverData.roomList[data.RID].status === "Waiting") ? "In Game" : "Hidden";
 	serverData.roomList[data.RID].hasVowel = true;
 
 	// ran for init purposes

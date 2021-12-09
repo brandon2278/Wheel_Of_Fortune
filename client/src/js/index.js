@@ -1,3 +1,34 @@
+/**
+ * Logic For Single-player game 
+ *
+ * @author Brandon Catwright
+ */
+
+/**
+ * Reveal correct letter and add money to user bank
+ *
+ * @author Brandon Catwright
+ */
+function reveal() {
+  var letter = document.getElementById('letter');
+  letter.play();
+  if (count == wordLength) {
+    win.style.display = 'block';
+    winner.innerHTML = '<span id=\"close\" class=\"close\">&times;</span><h3>Congratulations</h3><div style=\"font-family: serif;\"><h2> The Correct Response: "'
+      + word + '"</h2><h2> The Response Translation: "' + translation + '"</h2><h5>You have won a bonus of $5,000 for solving the puzzle</h5></div>';
+    var winnerSound = document.getElementById('winnerSound');
+    winnerSound.volume = 0.4;
+    winnerSound.play();
+    var span1 = document.getElementById('close');
+    span1.onclick = function () {
+      win.style.display = "none";
+      document.winScore.submit();
+    }
+  } else {
+    setTimeout(increaseScore, 2000);
+  }
+}
+
 // Get the modal
 var modal = document.getElementById("myModal");
 
@@ -192,26 +223,6 @@ document.getElementById("usrScore2").value = usrScore;
 document.getElementById("solvedUsrScore").value = usrScore;
 console.log(count);
 console.log(wordLength);
-// Reveal correct letter and add money to user bank
-function reveal() {
-  var letter = document.getElementById('letter');
-  letter.play();
-  if (count == wordLength) {
-    win.style.display = 'block';
-    winner.innerHTML = '<span id=\"close\" class=\"close\">&times;</span><h3>Congratulations</h3><div style=\"font-family: serif;\"><h2> The Correct Response: "'
-      + word + '"</h2><h2> The Response Translation: "' + translation + '"</h2><h5>You have won a bonus of $5,000 for solving the puzzle</h5></div>';
-    var winnerSound = document.getElementById('winnerSound');
-    winnerSound.volume = 0.4;
-    winnerSound.play();
-    var span1 = document.getElementById('close');
-    span1.onclick = function () {
-      win.style.display = "none";
-      document.winScore.submit();
-    }
-  } else {
-    setTimeout(increaseScore, 2000);
-  }
-}
 // Plays buzzer sound and removes money from user bank
 function fail() {
   document.fail.submit();

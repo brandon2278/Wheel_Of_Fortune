@@ -1,10 +1,18 @@
+<!--
+	This file contains the code for the leaderboard page
+
+	@author Colby O'Keefe (A00428974)
+-->
+
 <?php session_start();?>
 <!DOCTYPE html>
 <?php
 
 	/*
+	 * This function displays all the users infomation to the leaderboard table
 	 *
-	 * Author(s): Colby O'Keefe (A00428974)
+	 * @param users The users data from the database
+	 * @author Colby O'Keefe (A00428974)
 	 */
 	function displayLeaderboard($users) {            
 		while($row = $users->fetch_assoc()) {
@@ -12,7 +20,7 @@
 			if ($row['matchesLose'] != 0) {
 				$winRatio = $winRatio / $row['matchesLose'];
 			}
-			echo "<tr style=\"font-size: 1em; color: white; text-align: center\">";
+			echo "<tr style=\"font-size: 2vw; color: white; text-align: center\">";
 			echo "<td>" . $row["username"] . "</td>";
 			echo "<td>$" . $row["score"] . "</td>";
 			echo "<td>$" . $row["highscore"] . "</td>";
@@ -22,8 +30,10 @@
 	}
 	
 	/*
+	 * This function fetches the user data from the database and returns it.
 	 *
-	 * Author(s): Colby O'Keefe (A00428974)
+	 * @return User data from the database
+	 * @author Colby O'Keefe (A00428974)
 	 */
 	function getUserData() {
 		require "../src/php/db.php";
@@ -51,7 +61,7 @@
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 		<script> window.name = 'null' </script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
-		<script src="../src/js/Leaderboard.js"></script>
+		<script src="../src/js/leaderboard.js"></script>
 		<script src="../src/js/Keyboard.js"></script>
 		<script src="../src/js/leaderboard.js"></script>
 		<link rel="stylesheet" href="../src/style.css">
@@ -59,12 +69,11 @@
 	</head>
 
 	<body align="center">
-		<a class="btn btn-dark" href="../" role="button">Back</a>
-		<input class="input-group-text" href="../" onkeyup = "updateSearch(this)"></input>
+		<input class="input-group-text" style="float: right; margin-right: 10vw;" href="../" onkeyup = "updateSearch(this)"></input>
 		<div id="lobby-view-container">
 			<table id="lobby-table">
 			<tbody>
-			<tr style="text-decoration: underline; text-align: center">
+			<tr id="leaderboard-header">
 				<td onclick = "sortByUsername()">Username</td>
 				<td onclick = "sortByScore()">Single-Player Score</td>
 				<td onclick = "sortByHighScore()">Mutli-Player Highscore</td>
@@ -77,7 +86,9 @@
 			</tbody>
 			</table>
 		</div>
-
+		<div align="center" style="width: 100%;">
+			<a style="margin-top: 10px" class="btn btn-dark" href="../" role="button">Back</a>
+		</div>
 	</body>    
 
 </html>

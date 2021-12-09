@@ -13,6 +13,7 @@ let expressWS = require("express-ws")(app);
 // creates a new event emitter and forward to lobby.js/game.js
 let requestHandler = new EventEmitter();
 require("./handlers/lobby.js")(requestHandler);
+require("./handlers/matchmaking.js")(requestHandler)
 require("./handlers/game.js")(requestHandler);
 
 app.ws("/", (ws, req) => {

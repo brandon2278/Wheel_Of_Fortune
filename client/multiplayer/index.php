@@ -102,6 +102,7 @@
 	<center>
 		<a class="btn btn-dark" id="lobby-button" href="../" role="button">Back</a>
 		<a class="btn btn-dark" id="lobby-button" onclick="document.getElementById('create-lobby').style.visibility = 'visible';" role="button">Create Lobby</a>
+		<a onclick = "joinMatchmaking()" class="btn btn-dark" id="lobby-button" style="font-family:fortune;">Matchmaking</a>
 	</center>
 </body>    
 <script src ="../src/js/Client.js"></script>

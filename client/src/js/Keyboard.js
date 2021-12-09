@@ -1,3 +1,9 @@
+/**
+ *
+ *
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
 
 var lastKey = null;
 

@@ -21,6 +21,14 @@ document.addEventListener("DOMContentLoaded", () =>  {
 });
 
 /*
+ * Joins Looby Via Matchmaking
+ */
+serverCallbacks.addEventListener("joinMatchmaking", (e) => {
+    const data = e.detail;
+    document.location.href = "./lobby/?RID=" + data.RID;
+});
+
+/*
  * Updates the list of rooms on the request of the server.
  */
 serverCallbacks.addEventListener("updateRoomList", (e) => {
@@ -38,6 +46,62 @@ serverCallbacks.addEventListener("passwordCheckResult", (e) => {
 	if (data.correct) document.location.href = "./lobby/?RID=" + data.RID;
 	else displayIncorrectPasswordMessage();
 });
+
+/**
+ * This function starts matchmaking
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
+function joinMatchmaking() {
+    let intervalId;
+
+    swal({
+        title: "matchmaking",
+        content: {
+            element: "p",
+            innerText: "finding players",
+            attributes: {
+                id: "matchmaking-loading",
+            },
+        },
+        button: {
+            text: "cancel",
+            value: true,
+            visible: true,
+            className: "btn btn-warning",
+            closeModal: true,
+        }
+    }).then(() => {
+        const packet = {
+            "requestType": "leaveMatchmaking",
+            "user": user,
+        };
+        ws.send(JSON.stringify(packet));
+
+        clearInterval(intervalId);
+    });
+
+    let count = 0;
+    let waitTime = 0;
+    intervalId = setInterval(() => {
+        let loading = document.getElementById("matchmaking-loading");
+        if (loading)
+        {
+            loading.innerText = waitTime.toString() + "s. finding players" + ".".repeat(count);
+            count++;
+            if (count == 4) count = 0;
+            waitTime++;
+        }
+    }, 1000);
+
+    const packet = {
+        "requestType": "joinMatchmaking",
+        "user": user,
+    };
+
+    ws.send(JSON.stringify(packet));
+    
+}
 
 /*
  * Display an alert to the user letting them know their login attempt
@@ -245,7 +309,9 @@ function displayRooms() {
 		// Checks if the room is open to join if so the text get colored white otherwise the room is colored grey 
 		if(roomList[key].status === "Waiting" && roomList[key].userList.length < roomList[key].maxPlayerCount) {
 			lobbyRow.style.color = "white";
-		} else {
+		} else if(roomList[key].status === "Hidden") {
+			continue; 
+		}else {
 			lobbyRow.style.color = "grey";
 		}
 		

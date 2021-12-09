@@ -833,10 +833,16 @@ input {
 }
 
 .lobby-button {
-	display: inline-table;
-	font-size: 1.5vh;
-	margin-bottom: 0.5vh;
-	width: 50%;
+  display: inline-table;
+  font-size: 1.5vh;
+  margin-bottom: 0.5vh;
+  width: 50%;
+}
+
+#leaderboard-header {
+  text-decoration: underline; 
+  text-align: center;
+  font-size: 2vw;
 }
 
 input[type='checkbox'] {
