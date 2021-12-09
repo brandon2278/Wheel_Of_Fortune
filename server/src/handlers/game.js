@@ -126,6 +126,7 @@ async function getRandomPuzzle(category, RID) {
 
 	// Adds puzzle to used puzzles list
 	serverData.roomList[RID].usedPuzzles.push(getPuzzleWord(puzzles[index], category));
+	console.log(puzzles[index]);
 	return puzzles[index];
 }
 
@@ -630,18 +631,40 @@ async function initGame(data) {
 }
 
 /*
+ *
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
+function hasAllPlayersStarted(userList) {
+	for (let user in userList) {
+		if (user.hasStarted === false) return false;
+	}
+
+	return true;
+}
+
+/*
  * Sets up request handlers
  */
 module.exports = (requestHandler) => {
 	requestHandler.on("startGame", async (data, req) => {
-		// Inits game 
-		await initGame(data);
+		// Finds the users index
+		var foundIndex = serverData.roomList[data.RID].userList.findIndex(u => u.UID === data.user.UID);
+		// sets user started flag to true
+		if (foundIndex !== -1) {
+			serverData.roomList[data.RID].userList.hasStarted = true;
+		}
 
-		// Tells everyone in the lobby to start the game
-		communicate.emitToRoom(data.RID, {
-			"responseType": "startGame",
-			"room": communicate.formatRoom(serverData.roomList[data.RID])
-		});
+		// Inits game if not already done
+		if (hasAllPlayersStarted(serverData.roomList[data.RID].userList)) { 
+			await initGame(data); 
+
+			// Tells everyone in the lobby to start the game
+			communicate.emitToRoom(data.RID, {
+				"responseType": "startGame",
+				"room": communicate.formatRoom(serverData.roomList[data.RID])
+			});
+		}
 	});
 	
 	requestHandler.on("checkLetter", async (data, req) => {
@@ -738,17 +761,27 @@ module.exports = (requestHandler) => {
 		serverData.roomList[data.RID].userList[currentPlayerIndex].madeMove = false;
 		switchToNextPlayer(data.RID);
 		
-		
+		var winMessage;
 		// checks if the guess was correct or not
 		if(guessIsCorrect(data.guess, currentWord)) {
 			// Adds score to user and update game
 			addScoreToPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].correctScore);
 			await updateGame(data.RID, currentPlayerIndex);
+			winMessage = "Correctly";
 		} else {
 			// subtract score from user
 			subtractScoreFromPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].correctScore);
+			winMessage = "Incorrectly";
 		}
 		
+		// Shows result from solve attempt
+		communicate.emitToRoom(data.RID, {
+			"responseType": "showSolveResult",
+			"solvedBy": serverData.roomList[data.RID].userList[currentPlayerIndex],
+			"winState": winMessage,
+			"value": data.guess
+		});
+
 		// updates the lobby with the current toom infomation
 		communicate.emitToRoom(data.RID, {
 			"responseType": "updateRoom",
@@ -840,7 +873,7 @@ module.exports = (requestHandler) => {
 		if (foundIndex !== -1) {
 			// sets in game status
 			serverData.roomList[data.RID].userList[foundIndex].inGame = data.user.inGame;    
-			serverData.roomList[data.RID].userList[foundIndex].madeMove = "false";    
+			serverData.roomList[data.RID].userList[foundIndex].madeMove = false;    
 		}
 
 		// If no players are left in lobby chnage status to waiting else switch to next player
