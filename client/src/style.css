@@ -399,6 +399,7 @@ tr.container1 {
 
 #lobby-table {
   width: 100%;
+  height: 10px;
   font-size: 2em;
   margin: 25px;
   table-layout: fixed
@@ -818,6 +819,7 @@ input {
     overflow-x: hidden;
     width: 80%;
     text-overflow: ellipsis;
+    font-size: 2vw;
 }
 
 .lobby-user-container{
@@ -837,15 +839,6 @@ input {
 	width: 50%;
 }
 
-@media screen and (max-width: 1024px) {
-    #SideBar {
-        display: none !important;
-    }
-    #ChatContainer {
-        width: 100%;
-    }
-}
-
 input[type='checkbox'] {
     width:20px;
     height:20px;
@@ -853,3 +846,4 @@ input[type='checkbox'] {
     border-radius:5px;
     border:2px solid #555;
 }
+

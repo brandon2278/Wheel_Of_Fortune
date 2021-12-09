@@ -1,12 +1,34 @@
+/**
+ *
+ *
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
+
+// Requires
 let serverData = require("../data.js");
 let communicate = require("../api/communicate.js")
 
-const MAX_TIMEOUT = 2000;
+// Max timeout for user is 30,000 ms (30s) 
+const MAX_TIMEOUT = 30000;
 
+// Checks for dissconnected WebSockets every 5s
+const CHECK_DISCONNECTS_EVERY = 5000
+
+/*
+ * Checks for "dead" users on an interval
+ */
 setInterval(() => {
 		clearRooms();
-}, 5000);
+}, CHECK_DISCONNECTS_EVERY);
 
+/**
+ * This function finds a user given there WebSocket
+ *
+ * @param ws The user WebSocket
+ * @return The found user
+ * @author Colby O'Keefe (A00428974)
+ */
 function getUserFromWS(ws) {
 	var UID = null;
 	for (let key in serverData.userWebSockets) {
@@ -23,6 +45,13 @@ function getUserFromWS(ws) {
 	return undefined;
 }
 
+/**
+ * This function find the index of a user in the room's user list given there UID
+ *
+ * @param UID The users UID
+ * @return The users index
+ * @author Colby O'Keefe (A00428974)
+ */
 function getUserIndex(UID) {
 	for (let key in serverData.roomList) {
 		var foundIndex = serverData.roomList[key].userList.findIndex(u => u.UID === UID);
@@ -31,29 +60,45 @@ function getUserIndex(UID) {
 	return -1;
 }
 
+/**
+ * This function adds a user to a room.
+ * 
+ * @param RID The ID of the room
+ * @param user The user that want to join the room
+ * @param ws The users WebSocket
+ * @return True if the user succssfully joinned the lobby False otherwise
+ * @author Colby O'Keefe (A00428974)
+ */
 function joinRoom(RID, user, ws) {
-	console.log(Object.keys(serverData.userWebSockets).length);
+	// Check if the room exist
 	if (serverData.roomList[RID] === undefined) {
 		return false;
 	}
+	// Checks if the user is already in the room i.e. dead WebSocket
 	var foundUser = serverData.roomList[RID].userList.find((e) => {
 		return e.UID == user.UID
 	});
 
+	// If user was not found adds them to room
 	if (foundUser === undefined) {
-		console.log("New User!!!");
 		const packet = user
 		serverData.userWebSockets[user.UID] = ws;
 		serverData.roomList[RID].userList.push(packet);
 		return true;
 	}
 	else {
-		console.log("Here!")
+		// Repalce users old WebSocket if they were in the room before
 		serverData.userWebSockets[foundUser.UID] = ws; 
 		return false;
 	}
 }
 
+/**
+ * 
+ * @param RID The room ID
+ * @param userIndex 
+ * @author Colby O'Keefe (A00428974)
+ */
 function removeUser(RID, userIndex) {
 	let isLeader = serverData.roomList[RID].userList[userIndex].isLeader; 
 	serverData.roomList[RID].userList.splice(userIndex, 1);

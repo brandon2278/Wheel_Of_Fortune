@@ -3,22 +3,7 @@
 <?php session_start();?>
 
 <head>
-	<script>
-	function getUserInfomation() {
-			 return {
-				 "Name": <?php echo '"'.$_SESSION['userId'].'"'; ?>,
-		 "UID" : <?php echo '"'.$_SESSION['Id'].'"'; ?>,
-		 "closeTime": -1,
-		 "isLeader": false,
-		 "isReady": false,
-		 "score": 0,
-		 "mouseX": 0,
-		 "mouseY": 0,
-		 "inGame": false,
-		 "pointerColor": "red"
-				}
-		}
-	</script>
+	<?php include "../../src/php/getUser.php" ?>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,19 +15,6 @@
 	<script src="../../src/js/Keyboard.js"></script>
 	<link rel="stylesheet" href="../../src/style.css">
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-	<style>
-	.swal-overlay {
-		z-index: 1;
-	}
-		.swal-modal {
-			background-color: rgba(72, 21, 131, 0.9);
-		border: none;
-		}
-
-		.swal-title {
-			color: rgb(255, 223, 79);
-		}
-	</style>
 	<title>Wheel of Fortune</title>
 </head>
 
