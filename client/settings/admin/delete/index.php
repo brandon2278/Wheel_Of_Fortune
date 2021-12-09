@@ -20,27 +20,46 @@ session_start();
 </head>
 
 
-
 <body id="home" class="index">
-	<div align="center">
-		<h1>MI'KMAW WHEEL oF FORTUNE</h1>
-	</div>
-	<center>
-		<div class="home-screen">
-			<div align="center">
-				<h2>Choose a Category</h2>
-				<ul class="list-unstyled">
-					<li><a class="btn btn-dark" href="./animals.php" role="button"> Animals </a></li>
-					<li><a class="btn btn-dark" href="./greetings.php" role="button"> Greetings </a></li>
-					<li><a class="btn btn-dark" href="./phrases.php" role="button"> Phrases </a></li>
-					<li><a class="btn btn-dark" href="./food.php" role="button"> Food </a></li>
-					<li><a class="btn btn-dark" href="./earth.php" role="button"> Earth </a></li>
-					<li><a class="btn btn-dark" href="./numbers.php" role="button"> Numbers </a></li>
-				</ul>
-				<a class="btn btn-warning" href="../../">Back</a>
-			</div>
-		</div>
-	</center>
+    <div align="center">
+        <h1>MI'KMAW WHEEL oF FORTUNE</h1>
+    </div>
+    <center>
+        <div class="home-screen">
+            <!-- Forms that submit get method to a delete page with the corresponding category selected -->
+            <div>
+                <h2>Choose a Category</h2>
+                <ul class="list-unstyled">
+                    <form action="delete.php" method="get">
+                        <input type="hidden" id="category" name="category" value="animals">
+                        <li><input type="submit" value="Animals" class="btn btn-dark" role="button"></li>
+                    </form>
+                    <form action="delete.php" method="get">
+                        <input type="hidden" id="category" name="category" value="greetings">
+                        <li><input type="submit" value="Greetings" class="btn btn-dark" role="button"></li>
+                    </form>
+                    <form action="delete.php" method="get">
+                        <input type="hidden" id="category" name="category" value="phrases">
+                        <li><input type="submit" value="Phrases" class="btn btn-dark" role="button"></li>
+                    </form>
+                    <form action="delete.php" method="get">
+                        <input type="hidden" id="category" name="category" value="food">
+                        <li><input type="submit" value="Food" class="btn btn-dark" role="button"></li>
+                    </form>
+                    <form action="delete.php" method="get">
+                        <input type="hidden" id="category" name="category" value="earth">
+                        <li><input type="submit" value="Earth" class="btn btn-dark" role="button"></li>
+                    </form>
+                    <form action="delete.php" method="get">
+                        <input type="hidden" id="category" name="category" value="numbers">
+                        <li><input type="submit" value="Numbers" class="btn btn-dark" role="button"></li>
+                    </form>
+                </ul>
+                <a class="btn btn-warning" href="../../index.php">Back</a>
+                <br>
+            </div>
+        </div>
+    </center>
 
 
 

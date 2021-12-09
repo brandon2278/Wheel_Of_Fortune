@@ -130,6 +130,22 @@ session_start();
 
 				</div>";
 		}
+		// Require Database Name and Password
+		require 'src/php/db.php';
+		// Create connection
+		$conn = new mysqli($serverName, $dbUsername, $dbPassword, $dbName);
+		// Check connection
+		if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+		//Set phraseID to 0 incase different categories have different number of saved words so it does not return null
+		// if a category had less words!
+		if (isset($_SESSION['Id'])) {
+			$phraseUP = "UPDATE users
+            SET phraseID = '0' 
+            WHERE username= '" . $_SESSION['userId'] . "' ";
+			$conn->query($phraseUP);
+		}
 		?>
 	</section>
 

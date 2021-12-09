@@ -29,26 +29,26 @@ session_start();
 			<div align="center">
 				<h2>Choose a Category</h2>
 				<ul class="list-unstyled">
-					<form action="./picture/" method="get">
+					<form action="../picture/" method="get">
 						<input type="hidden" id="category" name="category" value="animals">
 						<li><input type="submit" value="Animals" class="btn btn-dark" role="button"></li>
 					</form>
-					<form action="./word/" method="get">
+					<form action="../word/" method="get">
 						<input type="hidden" id="category" name="category" value="greetings">
 						<li><input type="submit" value="Greetings" class="btn btn-dark" role="button"></li>
 					</form>
-					<form action="./phrases/" method="get">
+					<form action="../phrases/" method="get">
 						<li><input type="submit" value="Phrases" class="btn btn-dark" role="button"></li>
 					</form>
-					<form action="./picture/" method="get">
+					<form action="../picture/" method="get">
 						<input type="hidden" id="category" name="category" value="food">
 						<li><input type="submit" value="Food" class="btn btn-dark" role="button"></li>
 					</form>
-					<form action="./picture/" method="get">
+					<form action="../picture/" method="get">
 						<input type="hidden" id="category" name="category" value="earth">
 						<li><input type="submit" value="Earth" class="btn btn-dark" role="button"></li>
 					</form>
-					<form action="./picture/" method="get">
+					<form action="../picture/" method="get">
 						<input type="hidden" id="category" name="category" value="numbers">
 						<li><input type="submit" value="Numbers" class="btn btn-dark" role="button"></li>
 					</form>

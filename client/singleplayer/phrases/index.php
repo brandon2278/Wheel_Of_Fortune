@@ -1,8 +1,7 @@
+<!-- Phrases/index.php -->
 <!-- This Page is the phrases section of the web app Mi'kmaw Wheel of Fortune -->
 <!-- Group 11 -->
 <!-- Created and Designed By: Brandon, Colby, Monica, Elisa and Lugin -->
-
-<!-- Under Construction areas are the Solve feature and the bankrupt feature! -->
 
 <!-- Session start for logged in user! -->
 <?php
@@ -491,7 +490,7 @@ if ($conn->connect_error) {
 
 
 	<!-- Forms that send user score and temp score to the php side to be sent to the database -->
-	<form name="theForm" id="subm" action="" method="post">
+	<form name="revealForm" id="subm" action="" method="post">
 		<input type="hidden" id="tempScore" name="tempScore" value="" />
 		<input type="hidden" id="usrScore" name="usrScore" value="" />
 		<input type="hidden" id="reveal" name="reveal" value="1" />
@@ -541,10 +540,6 @@ if ($conn->connect_error) {
 				WHERE username= '" . $_SESSION['userId'] . "' ";
 				$conn->query($sql);
 			}
-
-			// If the counter is equal the length of the phrase then it has been solved
-			// It plays the winning sound and prints out the correct phrase and translation
-			// Then when exits shuffles to another phrase
 			echo "
 			<script type='text/javascript'>
 					var win = document.getElementById('win'); 

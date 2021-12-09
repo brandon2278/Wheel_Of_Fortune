@@ -457,7 +457,7 @@ if ($conn->connect_error) {
 
 
 	<!-- Forms that send user score and temp score to the php side to be sent to the database -->
-	<form name="theForm" id="subm" action="" method="post">
+	<form name="revealForm" id="subm" action="" method="post">
 		<input type="hidden" id="tempScore" name="tempScore" value="" />
 		<input type="hidden" id="usrScore" name="usrScore" value="" />
 		<input type="hidden" id="reveal" name="reveal" value="1" />
