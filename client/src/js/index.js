@@ -116,9 +116,6 @@ for (var i = 0; i < wordLength; i++) {
     count++;
   }
 }
-//console.log(count);
-//console.log(wordLength);
-
 
 // Gets each key from the keyboard and if clicked displays the letter in the puzzle grid if correct
 var keys = document.querySelectorAll(".keyboard-letters")
@@ -228,7 +225,7 @@ function fail() {
   document.fail.submit();
 }
 function increaseScore() {
-  document.theForm.submit();
+  document.revealForm.submit();
 }
 // script to close modals
 var span = document.getElementsByClassName("close")[0];
