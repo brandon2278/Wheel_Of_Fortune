@@ -303,13 +303,13 @@ module.exports = (requestHandler) => {
 		updateRoom(data.RID);
 	});
 
-	reuqestHandler.on("checkIfVaildRID", (data, req)) {
+	requestHandler.on("checkIfValidRID", (data, req) => {
 		const packet = {
-			"responseType": "vaildRIDResults",
-			"isVaild": data.RID in serverData.roomList
+			"responseType": "validifyRIDResult",
+			"isValid": data.RID in serverData.roomList
 		};
-		req.send(JSON.stringify("packet"));
-	}
+		req.ws.send(JSON.stringify(packet));
+	});
 	
 	return requestHandler;
 };

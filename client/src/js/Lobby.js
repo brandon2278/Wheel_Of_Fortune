@@ -79,6 +79,27 @@ serverCallbacks.addEventListener("startCountdown", async (e) => {
 });
 
 /*
+ * Inits the lobby upon go ahead from server
+ *
+ * @author Colby  O'Keefe (A00428974)
+ */
+function init() {
+	// Gets user infomation
+	user = getUserInfomation();
+
+	// Joins the room
+	joinRoom(RID);
+
+	// Sends a request to the server to get room infomation
+	const packet = {
+		"requestType": "getRoom",
+		"RID": RID
+	};
+
+	ws.send(JSON.stringify(packet));
+}
+
+/*
  * This function removes the user from the room.
  * 
  * @author Colby O'Keefe (A00428974)
@@ -404,17 +425,10 @@ function startGame() {
  * Runs when the WebSocket connection is opened
  */
 ws.onopen = () => {
-	// Gets user infomation
-	user = getUserInfomation();
-
-	// Joins the room
-	joinRoom(RID);
-
-	// Sends a request to the server to get room infomation
 	const packet = {
-		"requestType": "getRoom",
+		"requestType": "checkIfValidRID",
 		"RID": RID
-	};
+	}
 
 	ws.send(JSON.stringify(packet));
 };

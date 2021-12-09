@@ -23,16 +23,26 @@ setInterval(() => {
 }, CHECK_DISCONNECTS_EVERY);
 
 
+/*
+ *
+ *
+ *
+ *
+ */
 function checkForTimeouts() {
 	for(let RID in serverData.roomList) {
+		if (serverData.roomList[RID].userList[serverData.roomList[RID].currentPlayerIndex] == undefined) continue;
+
 		if (serverData.roomList[RID].status === "In Game" && !serverData.roomList[RID].userList[serverData.roomList[RID].currentPlayerIndex].inGame) {
 			if (Date.now() - serverData.roomList[RID].userList[serverData.roomList[RID].currentPlayerIndex].leftGameTime > MAX_TIMEOUT) {
 				serverData.roomList[RID].userList[serverData.roomList[RID].currentPlayerIndex].madeMove = false;    
-				switchToNextPlayer(RID);
-				communicate.emitToRoom(RID, {
-					"responseType": "updateRoom",
-					"room": communicate.formatRoom(serverData.roomList[RID])
-				});
+				if (hasPlayersLeftInGame(RID)) {
+					switchToNextPlayer(RID);
+					communicate.emitToRoom(RID, {
+						"responseType": "updateRoom",
+						"room": communicate.formatRoom(serverData.roomList[RID])
+					});
+				}
 
 			}
 		}

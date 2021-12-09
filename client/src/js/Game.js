@@ -23,26 +23,30 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener('mousemove', (e) => {
-	updateMousePosition(e); 
-	const packet = {
-		"requestType": "updatePointers",
-		"RID": RID,
-		"user": user
-	};
+	if (hasStarted) {
+		updateMousePosition(e); 
+		const packet = {
+			"requestType": "updatePointers",
+			"RID": RID,
+			"user": user
+		};
 
-	ws.send(JSON.stringify(packet));
+		ws.send(JSON.stringify(packet));
+	}
 });
 
 window.addEventListener('beforeunload', (e) => {
-	user.inGame = false;
-	user.madeMove = false;
-	const packet = {
-		"requestType": "startTimeout",
-		"RID": RID,
-		"user": user
-	};
+	if (hasStarted) {
+		user.inGame = false;
+		user.madeMove = false;
+		const packet = {
+			"requestType": "startTimeout",
+			"RID": RID,
+			"user": user
+		};
 
-	ws.send(JSON.stringify(packet));
+		ws.send(JSON.stringify(packet));
+	}
 }, false);
 
 serverCallbacks.addEventListener("getRoom", (e) => {
@@ -132,6 +136,28 @@ serverCallbacks.addEventListener("boughtVowel", (e) => {
 		displayNextPlayer();
 	});
 });
+
+/*
+ * Inits the game upon go ahead from server
+ *
+ * @author Colby  O'Keefe (A00428974)
+ */
+function init() {
+	user = getUserInfomation();
+	user.inGame = true;
+	joinRoom(RID);
+	const packet = {
+		"requestType": "getInitRoom",
+		"RID": RID
+	};
+	const packet2 = {
+		"requestType": "updateUserStatus",
+		"RID": RID,
+		"user": user
+	};
+	ws.send(JSON.stringify(packet));
+	ws.send(JSON.stringify(packet2));
+}
 
 function displayGameInfoWindow() {
 	var gamePanel = document.getElementById("game-panel");
@@ -718,18 +744,10 @@ function displayQuestion() {
 }
 
 ws.onopen = () => {
-	user = getUserInfomation();
-	user.inGame = true;
-	joinRoom(RID);
 	const packet = {
-		"requestType": "getInitRoom",
+		"requestType": "checkIfValidRID",
 		"RID": RID
-	};
-	const packet2 = {
-		"requestType": "updateUserStatus",
-		"RID": RID,
-		"user": user
-	};
+	}
+
 	ws.send(JSON.stringify(packet));
-	ws.send(JSON.stringify(packet2));
 };

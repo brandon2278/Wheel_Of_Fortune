@@ -67,6 +67,31 @@ serverCallbacks.addEventListener("updateRoom", (e) => {
 });
 
 /*
+ * Gets the results from the vaild Room ID check
+ */
+serverCallbacks.addEventListener("validifyRIDResult", (e) => {
+	const data = e.detail;
+	if (data.isValid) init();
+	else invalidRoom();
+});
+
+/*
+ * Tells the user they attempted to connect to an invalid room and
+ * bring back to the mutliplayer home.
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
+function invalidRoom() {
+	swal({
+		title: "Invalid Room! Disconnecting...",            
+		button: false,
+		timer: 3000
+	}).then(() => {
+		document.location.href = "../";
+	});
+}
+
+/*
  * This function send a request to the server for the user to join
  * a room.
  * 
