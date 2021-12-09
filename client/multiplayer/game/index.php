@@ -1,28 +1,11 @@
 <!DOCTYPE html>
-<?php session_start();?>
 <html>
   <head>
-   <script>
-		function getUserInfomation() {
-			 return {
-				 "Name": <?php echo '"'.$_SESSION['userId'].'"'; ?>,
-		 "UID" : <?php echo '"'.$_SESSION['Id'].'"'; ?>,
-		 "closeTime": -1,
-		 "isLeader": false,
-		 "isReady": false,
-		 "score": 0,
-		 "madeMove": false,
-		 "mouseX": 0,
-		 "mouseY": 0,
-		 "inGame": true,
-		 "pointerColor": "red"
-			 }
-		}
-	</script>
+	<?php include "../../src/php/getUser.php" ?>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="shortcut icon" type="image/png" href="wallpapers/logo-5_0_0.png">
+	<link rel="shortcut icon" type="image/png" href="../../assets/images/logo-5_0_0.png">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">    
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
@@ -31,48 +14,10 @@
 	<script src="../../src/js/Winwheel.js"></script>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>    
-	<style>
-	.swal-overlay {
-		z-index: 50;
-	}
-		.swal-modal {
-			background-color: rgba(72, 21, 131, 0.9);
-		border: none;
-		}
-
-		.swal-title {
-			color: rgb(255, 223, 79);
-		}
-	</style>
 	<title>Wheel of Fortune</title>
   </head>
 
   <body id="game-body">
-	
-	<div id = "game-settings">
-		<button class="btn btn-dark" id="settings-btn" onclick="openSettings()">Settings</button>
-	</div>
-
-	<div id = "game-panel">
-		<div id = "game-panel-tabs">
-			<div class = "game-panel-tab game-panel-tab-selected" onclick = "gamePanelChangeTab(0)">chat</div>
-			<div class = "game-panel-tab" onclick = "gamePanelChangeTab(1)">users</div>
-			<div class = "game-panel-tab" onclick = "gamePanelChangeTab(2)">info</div>
-		</div>
-		<div id = "game-panel-content">
-			<div class = "game-panel-content-area" id = "game-panel-chat">
-				<div id = "game-panel-chat-message-container">
-				</div>
-				<input id = "message-box" class="useLobbyKeyboard">
-			</div>
-			<div class = "game-panel-content-area" id = "game-panel-users">
-				<div class = "game-panel-user">
-				</div>
-			</div>
-			<div class = "game-panel-content-area" id = "game-panel-info">
-			</div>
-		</div>
-	</div>
 	 <div id="myModal" class="modal" style="display: none;">
 		<div class="modal-content1">
 			<div align="center">
@@ -102,9 +47,31 @@
 
 	<center>
 	<div id="solveContainer">
+	<div id = "game-panel" style="display: none;">
+		<div id = "game-panel-tabs">
+			<div class = "game-panel-tab game-panel-tab-selected" onclick = "gamePanelChangeTab(0)">chat</div>
+			<div class = "game-panel-tab" onclick = "gamePanelChangeTab(1)">users</div>
+			<div class = "game-panel-tab" onclick = "gamePanelChangeTab(2)">info</div>
+		</div>
+		<div id = "game-panel-content">
+			<div class = "game-panel-content-area" id = "game-panel-chat">
+				<div id = "game-panel-chat-message-container">
+				</div>
+				<input id = "message-box" class="useLobbyKeyboard">
+			</div>
+			<div class = "game-panel-content-area" id = "game-panel-users">
+				<div class = "game-panel-user">
+				</div>
+			</div>
+			<div class = "game-panel-content-area" id = "game-panel-info">
+			</div>
+		</div>
+	</div>
 	<div id="screen-cover"> </div>
 
 		<h3 id="question-container">
+			<span id="user-game-info">
+			</span>
 			<span id="question-title"></span>
 			<br>
 			<img id="question-image"> </img>
@@ -193,13 +160,9 @@
 						  <button  class="btn btn-warning" onclick="solve()">Solve</button>
 						  <br></br>
 						 </div>
-						  <button class="btn btn-warning" id="hint"><i class="fas fa-volume-up"></i> Hint</button>
+				  <button class="btn btn-warning" id="hint"><i class="fas fa-volume-up"></i> Hint</button>
+				  <button class="btn btn-warning" onclick="displayGameInfoWindow()" id="game-info-btn">Game Info </button>
 				  <button class="btn btn-warning" onclick="leaveGame()" id="leave-game">Leave Game </button>
-
-				<div id=user-infomation align="center">
-				<div id=user-game-info>
-				</div>
-				</div>
 				</div>
 			</div>
 		</div>

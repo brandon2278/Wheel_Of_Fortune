@@ -302,6 +302,9 @@ function displayRooms() {
 
 	// Loops through each room currently open
 	for(let key in roomList) {
+		// Checks of the lobby is hidden i.e. a matchmaking lobby
+		if (roomList[key].isSerect) continue;
+
 		// Creates a new table row element for the lobby
 		var lobbyRow = document.createElement("tr");
 		lobbyRow.classList.add("lobby-entry");
@@ -309,9 +312,7 @@ function displayRooms() {
 		// Checks if the room is open to join if so the text get colored white otherwise the room is colored grey 
 		if(roomList[key].status === "Waiting" && roomList[key].userList.length < roomList[key].maxPlayerCount) {
 			lobbyRow.style.color = "white";
-		} else if(roomList[key].status === "Hidden") {
-			continue; 
-		}else {
+		} else {
 			lobbyRow.style.color = "grey";
 		}
 		

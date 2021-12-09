@@ -12,6 +12,33 @@ let communicate = require("../api/communicate.js");
 // A list of vowels in the Mi'Kmaq alphabet 
 const vowels = ['a','á','e','é','i','í','o','ó','u','ú'];
 
+// Max timeout for user is 10,000 ms (10s) 
+const MAX_TIMEOUT = 10000;
+
+// Checks for dissconnected WebSockets every 5s
+const CHECK_DISCONNECTS_EVERY = 5000
+
+setInterval(() => {
+	checkForTimeouts();
+}, CHECK_DISCONNECTS_EVERY);
+
+
+function checkForTimeouts() {
+	for(let RID in serverData.roomList) {
+		if (serverData.roomList[RID].status === "In Game" && !serverData.roomList[RID].userList[serverData.roomList[RID].currentPlayerIndex].inGame) {
+			if (Date.now() - serverData.roomList[RID].userList[serverData.roomList[RID].currentPlayerIndex].leftGameTime > MAX_TIMEOUT) {
+				serverData.roomList[RID].userList[serverData.roomList[RID].currentPlayerIndex].madeMove = false;    
+				switchToNextPlayer(RID);
+				communicate.emitToRoom(RID, {
+					"responseType": "updateRoom",
+					"room": communicate.formatRoom(serverData.roomList[RID])
+				});
+
+			}
+		}
+	}
+}
+
 /**
  * This function sets all users scores to zeros in a room
  *
@@ -331,7 +358,7 @@ async function nextRound(RID) {
  * @author COlby O'Keefe (A00428974)
  */
 function endMatch(RID) {
-	if(serverData.roomList[RID].status !== "Hidden") serverData.roomList[RID].status = "Waiting";
+	serverData.roomList[RID].status = "Waiting";
 }
 
 /*
@@ -584,7 +611,7 @@ async function initGame(data) {
 	serverData.roomList[data.RID].currentRound = 1;
 	serverData.roomList[data.RID].currentPuzzleNumber = 1;
 	serverData.roomList[data.RID].lastKey = false;
-	serverData.roomList[data.RID].status = (serverData.roomList[data.RID].status === "Waiting") ? "In Game" : "Hidden";
+	serverData.roomList[data.RID].status = "In Game";
 	serverData.roomList[data.RID].hasVowel = true;
 
 	// ran for init purposes
@@ -666,7 +693,7 @@ module.exports = (requestHandler) => {
 	requestHandler.on("spinWheel", (data, req) => {
 		// Send a request to the lobby to spin the wheel
 		var currentPlayerIndex = serverData.roomList[data.RID].currentPlayerIndex;
-		serverData.roomList[data.RID].userList[currentPlayerIndex].madeMove = true;
+	 	serverData.roomList[data.RID].userList[currentPlayerIndex].madeMove = true;
 		communicate.emitToRoom(data.RID, {
 			"responseType": "spinWheel",
 			"stopAngle": Math.random() * 360
@@ -803,6 +830,7 @@ module.exports = (requestHandler) => {
 		if (foundIndex !== -1) {
 			// sets in game status
 			serverData.roomList[data.RID].userList[foundIndex].inGame = data.user.inGame;    
+			serverData.roomList[data.RID].userList[foundIndex].madeMove = "false";    
 		}
 
 		// If no players are left in lobby chnage status to waiting else switch to next player
@@ -827,5 +855,20 @@ module.exports = (requestHandler) => {
 		});
 	});
 
+	requestHandler.on("startTimeout", (data, req) => {
+		// finds user index
+		var foundIndex = serverData.roomList[data.RID].userList.findIndex(u => u.UID === data.user.UID);
+		if (foundIndex !== -1) {
+			// sets in game status
+			serverData.roomList[data.RID].userList[foundIndex].inGame = false;    
+			serverData.roomList[data.RID].userList[foundIndex].leftGameTime = Date.now();    
+		}
+
+		communicate.emitToRoom(data.RID, {
+			"responseType": "updateRoom",
+			"room": communicate.formatRoom(serverData.roomList[data.RID])
+		});
+
+	});
 	return requestHandler;
 };

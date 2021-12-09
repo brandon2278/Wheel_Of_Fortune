@@ -6,6 +6,7 @@ function getUserInfomation() {
 		"Name": <?php echo '"'.$_SESSION['userId'].'"'; ?>,
 		"UID" : <?php echo '"'.$_SESSION['Id'].'"'; ?>,
 		"closeTime": -1,
+		"leftGameTime": -1,
 		"isLeader": false,
 		"isReady": false,
 		"score": 0,

@@ -35,8 +35,9 @@ document.addEventListener('mousemove', (e) => {
 
 window.addEventListener('beforeunload', (e) => {
 	user.inGame = false;
+	user.madeMove = false;
 	const packet = {
-		"requestType": "leaveGame",
+		"requestType": "startTimeout",
 		"RID": RID,
 		"user": user
 	};
@@ -132,24 +133,19 @@ serverCallbacks.addEventListener("boughtVowel", (e) => {
 	});
 });
 
+function displayGameInfoWindow() {
+	var gamePanel = document.getElementById("game-panel");
+
+	if (gamePanel.style.display === "none") gamePanel.style.display = "block";
+	else gamePanel.style.display = "none";
+}
+
 function updateUsersGameInfo() {
 	var container = document.getElementById("user-game-info");
 	container.innerHTML = "";
-	var round = document.createElement("p");
-	round.innerHTML = "Round: " + currentRoom.currentRound + "/" + currentRoom.maxNumberOfRounds;
-	container.appendChild(round);
-
-	var puzzleNum = document.createElement("p");
-	puzzleNum.innerHTML = "Puzzle: " + currentRoom.currentPuzzleNumber + "/" + currentRoom.puzzlesPerRound;
-	container.appendChild(puzzleNum);
-
 	var player = document.createElement("p");
-	player.innerHTML = "Current User's Turn: " + currentRoom.userList[currentRoom.currentPlayerIndex].Name;
+	player.innerHTML = "Playing: " + currentRoom.userList[currentRoom.currentPlayerIndex].Name;
 	container.appendChild(player);
-
-	var yourScore = document.createElement("p");
-	yourScore.innerHTML = "Your Score Is: $" + currentRoom.userList[currentRoom.currentPlayerIndex].score;
-	container.appendChild(yourScore);
 }
 
 async function displayBoughtVowel(vowel, name) {
@@ -697,9 +693,9 @@ function displayQuestion() {
 	if(fileType === "jpeg" || fileType === "peg" || fileType === "jpg") {
 		questionTitle.innerHTML = "Image";
 		img.src = question; 
-		img.style.height = '300px';
-			img.style.width = '450px';
-		img.style.border = '10px ridge rgba(0, 0, 0, 0.5)';
+		img.style.height = '30%';
+		img.style.width = '30vw';
+		img.style.border = '1vw ridge rgba(0, 0, 0, 0.5)';
 		img.style.borderRadius = '10%';
 		img.style.visibility = "visible";
 	} else if (fileType === "mp3") {
@@ -723,6 +719,7 @@ function displayQuestion() {
 
 ws.onopen = () => {
 	user = getUserInfomation();
+	user.inGame = true;
 	joinRoom(RID);
 	const packet = {
 		"requestType": "getInitRoom",

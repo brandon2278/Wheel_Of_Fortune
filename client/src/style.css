@@ -522,10 +522,11 @@ input {
 }
 
 #game-panel {
-  float: left;
   background-color: rgba(30, 30, 30, 0.5);
-  width: 300px;
-  height: 80%;
+  width: 80%;
+  height: 50%;
+  position: fixed;
+  z-index: 90;
 }
 #game-panel-tabs {
   text-align: center;
@@ -549,6 +550,8 @@ input {
 #game-panel-chat-message-container {
   height: calc(100% - 40px);
   overflow: hidden;
+  text-align: left;
+  font-size: 2vw;
 }
 .game-panel-tab:last-child {
   border-right: none;
@@ -741,7 +744,7 @@ input {
 
 #leave-game {
 	position: relative;
-	z-index: 40;
+	z-index: 35;
 }
 
 #user-infomation {
@@ -749,11 +752,6 @@ input {
 	background-color: rgba(0, 0, 0, 0.5);
 	width: 30%;
 	text-align: center;
-}
-
-#game-settings {
-	position: absolute;
-	right: 100px;
 }
 
 #lobby-button {
@@ -780,7 +778,7 @@ input {
 }
 
 .swal-overlay {
-	z-index: 1;
+	z-index: 40;
 }
 
 .swal-modal {
@@ -830,6 +828,7 @@ input {
 .user-color {
     position: relative;
     left: -0.5vw;
+    font-size: 2vw;
 }
 
 .lobby-button {
@@ -853,3 +852,13 @@ input[type='checkbox'] {
     border:2px solid #555;
 }
 
+#display-game-info {
+    position: absolute;
+    bottom: 0px;
+    margin-bottom: 5vh;
+}
+
+#game-info-btn {
+    position: relative;
+    z-index: 35;
+}

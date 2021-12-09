@@ -37,6 +37,7 @@ function formatRoom(room) {
 		"lossModifier": room.lossModifier,
 		"maxPlayerCount": room.maxPlayerCount,
 		"status": room.status,
+		"isSerect": room.isSerect,
 		"hasVowel": room.hasVowel,
 		"vowelPrice": room.vowelPrice,
 		"hasPassword": room.hasPassword

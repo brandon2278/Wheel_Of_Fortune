@@ -21,6 +21,7 @@ var user = {
 	"Name": "Tester",	// Stores the users username
 	"UID" : -1,		// Stores the users UID
 	"closeTime": -1,	// Stores the time since the user lost connect to the server
+	"leftGameTime": -1,	// Stores the time since the user left an active game
 	"isLeader": false,	// Stores if the user is the leader of the lobby
 	"isReady": false,	// Stores if the user has readied up or not
 	"mouseX": 0,		// Stores the users mouse x position

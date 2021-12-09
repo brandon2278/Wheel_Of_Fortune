@@ -224,6 +224,7 @@ module.exports = (requestHandler) => {
 			"maxNumberOfRounds": data.numRounds,
 			"maxPlayerCount": data.playerCount,
 			"status": data.status,
+			"isSerect": false,
 			"vowelPrice": data.vowelPrice,
 			"password": data.password,
 			"hasPassword": data.hasPassword
@@ -301,6 +302,14 @@ module.exports = (requestHandler) => {
 		serverData.roomList[data.RID].userList[getUserIndex(data.UID)].pointerColor = data.pointerColor;
 		updateRoom(data.RID);
 	});
+
+	reuqestHandler.on("checkIfVaildRID", (data, req)) {
+		const packet = {
+			"responseType": "vaildRIDResults",
+			"isVaild": data.RID in serverData.roomList
+		};
+		req.send(JSON.stringify("packet"));
+	}
 	
 	return requestHandler;
 };

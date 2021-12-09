@@ -67,6 +67,7 @@ function dispatchPlayers() {
 		"status": "Hidden",
 		"vowelPrice": 250,
 		"password": password,
+		"isSerect": true,
 		"hasPassword": false,
 	};
 
