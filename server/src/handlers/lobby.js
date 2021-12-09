@@ -1,6 +1,5 @@
 /**
- *
- *
+ * This file contains all server code related to the lobby system.
  *
  * @author Colby O'Keefe (A00428974)
  */
@@ -8,6 +7,7 @@
 // Requires
 let serverData = require("../data.js");
 let communicate = require("../api/communicate.js")
+let filter = require("../api/filter.js");
 
 // Max timeout for user is 30,000 ms (30s) 
 const MAX_TIMEOUT = 30000;
@@ -94,9 +94,10 @@ function joinRoom(RID, user, ws) {
 }
 
 /**
+ * Removes a user from a room
  * 
  * @param RID The room ID
- * @param userIndex 
+ * @param userIndex The index of the user in the room's user list
  * @author Colby O'Keefe (A00428974)
  */
 function removeUser(RID, userIndex) {
@@ -109,8 +110,16 @@ function removeUser(RID, userIndex) {
 	updateRoom(RID);
 }
 
+/**
+ * This function find any user with dead WebSockets and remove then from the
+ * lobby if there WebSocket was dead for longer than the max timeout. 
+ * 
+ * @author Colby O'Keefe (A00428974) 
+ */
 function clearRooms() {
+	// Loops through each room
 	for (let key in serverData.roomList) {
+		// Remove users in each room if they exceed the max timeout
 		serverData.roomList[key].userList.forEach((user, index, array) => {
 			if(serverData.userWebSockets[user.UID].readyState === 3) {
 				if(Date.now() - user.closeTime > MAX_TIMEOUT) {
@@ -118,6 +127,8 @@ function clearRooms() {
 				}
 			}
 		});
+
+		// Check if room is empty and if it is the lobby is removed
 		if (serverData.roomList[key].userList.length === 0) {
 			communicate.emitToRoom(key, {
 				"responseType": "removeLobby",
@@ -130,17 +141,32 @@ function clearRooms() {
 
 }
 
-function updateRoom(RID) {
-	
+/**
+ *  This function emits an updated room to 
+ *  every user in a lobby.
+ * 
+ * @param RID The ID of the room
+ * @author Colby O'Keefe (A00428974)
+ */
+function updateRoom(RID) {	
 	communicate.emitToRoom(RID, {
 		"responseType": "updateRoom",
 		"room": communicate.formatRoom(serverData.roomList[RID])
 	});
 }
 
+/**
+ * This function add a message to a room
+ *
+ * @param text The message being sent 
+ * @param RID The rooms ID
+ * @param user The user sending a message
+ * @author Colby O'Keefe (A00428974)
+ */
 function addMessage(text, RID, user) {
+
 	const message =  {
-		"message": text,
+		"message": filter.filterMessage(text),
 		"userName": user.Name,
 		"color": user.pointerColor
 	}
@@ -149,15 +175,26 @@ function addMessage(text, RID, user) {
 	updateRoom(RID);
 }
 
+/**
+ * This function update a user in a room
+ *
+ * @param user
+ * @param RID The ID of the room
+ * @author Colby O'Keefe (A00428974) 
+ */
 function updateUser(user, RID) {
 	var userIndex = getUserIndex(user.UID);
 	serverData.roomList[RID].userList[userIndex] = user;
 	updateRoom(RID);
 }
 
+/**
+ * Request handlers
+ */
 module.exports = (requestHandler) => {
+
 	requestHandler.on("getRoomList", (data, req) => {
-		console.log("At Get Room List")
+		// Sends the current room list to the client
 		const packet = {
 			"responseType": "updateRoomList",
 			"roomList": communicate.formatRoomList()
@@ -167,17 +204,16 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("joinRoom", (data, req) => {
-		//console.log("At Join Room");
-		//console.log(data);
+		// Emits the new room infomation to the lobby
 		var hasNewUser = joinRoom(data.RID, data.user, req.ws);
 		if(hasNewUser) {
-			console.log("Emmiting to Room " + data.RID);
 			updateRoom(data.RID);
 		}
 		
 	});
 
 	requestHandler.on("createRoom", (data, req) => {
+		// Sets up new room
 		serverData.roomList[data.RID] = {
 			"userList": [],
 			"roomName": data.roomName,
@@ -192,11 +228,13 @@ module.exports = (requestHandler) => {
 			"password": data.password,
 			"hasPassword": data.hasPassword
 		}
+		// Add clinet to room
 		data.user.isLeader = true;
 		joinRoom(data.RID, data.user, req.ws);
 	});
 
 	requestHandler.on("getRoom", (data, req) => {
+		// Sends room to client
 		const packet = {
 			"responseType":"getRoom",
 			"room": communicate.formatRoom(serverData.roomList[data.RID])
@@ -205,24 +243,23 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("exitRoom", (data, req) => {
+		// removes user from room
 		let foundIndex = getUserIndex(data.user.UID);
-		console.log(foundIndex)
 		if (foundIndex !== -1) removeUser(data.RID, foundIndex);
 	});
 
 	requestHandler.on("sendMessage", (data, req) => {
+		// Adds message to room
 		addMessage(data.message, data.RID, data.user);
 	});
 
-	requestHandler.on("removeMessage", (data, req) => {
-	});
-
 	requestHandler.on("updateUser", (data, req) => {
+		// updates the user
 		updateUser(data.user, data.RID);
 	});
 	
 	requestHandler.on("close", (data, req) => {
-		console.log("Closed! :<");
+		// Detects when a users WebSocket closes
 		let user = getUserFromWS(req.ws);
 		if (user !== undefined) { 
 			user.closeTime = Date.now();
@@ -231,13 +268,16 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("startCountdown", (data, req) => {
+		// Emits ti lobby to start countdown
 		communicate.emitToRoom(data.RID, {
 			"responseType": "startCountdown"
 		});
 	});
 
 	requestHandler.on("checkLobbyPassword", (data, req) => {
+		// check if the clinet entered the current lobby password
 		var passwordIsCorrect = data.passwordAttempt === serverData.roomList[data.RID].password;
+		// sends password check results back to client
 		const packet = {
 			"responseType": "passwordCheckResult",
 			"correct": passwordIsCorrect,
@@ -248,6 +288,7 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("kickPlayer", (data, req) => {
+		// Removes the user from the lobby
 		removeUser(data.RID, getUserIndex(data.UID));
 		const packet = {
 			"responseType": "kick"
@@ -256,6 +297,7 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("updateUserPointerColor", (data, req) => {
+		// updates the color of the users mouse pointer
 		serverData.roomList[data.RID].userList[getUserIndex(data.UID)].pointerColor = data.pointerColor;
 		updateRoom(data.RID);
 	});

@@ -101,7 +101,6 @@ async function getRandomPuzzle(category, RID) {
  */ 
 function getPuzzleWord(puzzle, category) {
 	var word;
-	console.log(puzzle);
 	switch(category) {
 		case "phrases":
 			word = puzzle.response;
@@ -145,7 +144,6 @@ function getPuzzleSlots(puzzle, category) {
  */
 function isLetterInWord(word, letter) {
 	var temp = word.toUpperCase();
-	console.log(letter.toUpperCase());
 	return temp.includes(letter.toUpperCase());
 }
 
@@ -288,7 +286,6 @@ function isSolved(word, RID) {
 
 	// Checks if the puzzle is on the last letter
 	if(uniqueLetters == 1) {
-		console.log("Here!");
 		serverData.roomList[RID].lastKey = true;
 	}
 
@@ -552,38 +549,58 @@ function resetReadyStatus(RID) {
 		user.isReady = false;
 	});
 }
+/**
+ * This function initializes the game setting for a new game to start
+ *
+ * @param data Data packet containing infomation from the client
+ * @author Colby O'Keefe (A00428974)
+ */
+async function initGame(data) {
+	// Reset User Infomation
+	resetReadyStatus(data.RID)
+	resetsUserScores(data.RID)
+
+	// Reset used categories/puzzles
+	serverData.roomList[data.RID].usedCategories = [];
+	serverData.roomList[data.RID].usedPuzzles = [];
+
+	// Gets first player
+	var firstPlayerIndex = Math.floor(Math.random() * serverData.roomList[data.RID].userList.length); 
+	
+	// Gets the first category/puzzle
+	var firstCategory = await getRandomCategory(data.RID);
+	var firstPuzzle = await getRandomPuzzle(firstCategory, data.RID);
+
+	// Inits the room data
+	serverData.roomList[data.RID].currentCategory = firstCategory;
+	serverData.roomList[data.RID].currentPuzzle = firstPuzzle;
+	serverData.roomList[data.RID].puzzleQuestion = getPuzzleQuestion(firstPuzzle, firstCategory);
+	serverData.roomList[data.RID].puzzleHint = getPuzzleHint(firstPuzzle, firstCategory);
+	serverData.roomList[data.RID].puzzlePhrase = getPuzzlePhrase(firstPuzzle, firstCategory);
+	serverData.roomList[data.RID].slots = getPuzzleSlots(firstPuzzle, firstCategory);
+	serverData.roomList[data.RID].currentPlayerIndex = firstPlayerIndex;
+	serverData.roomList[data.RID].solved = {};
+	serverData.roomList[data.RID].usedLetters = [];
+	serverData.roomList[data.RID].currentRound = 1;
+	serverData.roomList[data.RID].currentPuzzleNumber = 1;
+	serverData.roomList[data.RID].lastKey = false;
+	serverData.roomList[data.RID].status = "In Game";
+	serverData.roomList[data.RID].hasVowel = true;
+
+	// ran for init purposes
+	getRandomVowel(getPuzzleWord(firstPuzzle, firstCategory), serverData.roomList[data.RID].solved, data.RID); 
+
+}
 
 /*
  * Sets up request handlers
  */
 module.exports = (requestHandler) => {
 	requestHandler.on("startGame", async (data, req) => {
-		resetReadyStatus(data.RID)
-		resetsUserScores(data.RID)
-		serverData.roomList[data.RID].usedCategories = [];
-		serverData.roomList[data.RID].usedPuzzles = [];
+		// Inits game 
+		await initGame(data);
 
-		var firstPlayerIndex = Math.floor(Math.random() * serverData.roomList[data.RID].userList.length); 
-		var firstCategory = await getRandomCategory(data.RID);
-		var firstPuzzle = await getRandomPuzzle(firstCategory, data.RID);
-
-		serverData.roomList[data.RID].currentCategory = firstCategory;
-		serverData.roomList[data.RID].currentPuzzle = firstPuzzle;
-		serverData.roomList[data.RID].puzzleQuestion = getPuzzleQuestion(firstPuzzle, firstCategory);
-		serverData.roomList[data.RID].puzzleHint = getPuzzleHint(firstPuzzle, firstCategory);
-		serverData.roomList[data.RID].puzzlePhrase = getPuzzlePhrase(firstPuzzle, firstCategory);
-		serverData.roomList[data.RID].slots = getPuzzleSlots(firstPuzzle, firstCategory);
-		serverData.roomList[data.RID].currentPlayerIndex = firstPlayerIndex;
-		serverData.roomList[data.RID].solved = {};
-		serverData.roomList[data.RID].usedLetters = [];
-		serverData.roomList[data.RID].currentRound = 1;
-		serverData.roomList[data.RID].currentPuzzleNumber = 1;
-		serverData.roomList[data.RID].lastKey = false;
-		serverData.roomList[data.RID].status = "In Game";
-		serverData.roomList[data.RID].hasVowel = true;
-
-		getRandomVowel(getPuzzleWord(firstPuzzle, firstCategory), serverData.roomList[data.RID].solved, data.RID); 
-
+		// Tells everyone in the lobby to start the game
 		communicate.emitToRoom(data.RID, {
 			"responseType": "startGame",
 			"room": communicate.formatRoom(serverData.roomList[data.RID])
@@ -591,44 +608,54 @@ module.exports = (requestHandler) => {
 	});
 	
 	requestHandler.on("checkLetter", async (data, req) => {
+		// Store values commonly used
 		var currentPuzzle = serverData.roomList[data.RID].currentPuzzle;
 		var currentCategory = serverData.roomList[data.RID].currentCategory;
 		var currentWord = getPuzzleWord(currentPuzzle, currentCategory);
 		var currentPlayerIndex = serverData.roomList[data.RID].currentPlayerIndex;
 		var score;
 
+		// Reset made move to false
 		serverData.roomList[data.RID].userList[currentPlayerIndex].madeMove = false;
 		
+		// checks of letter guessed is in the word or not
 		if(isLetterInWord(currentWord, data.letter)) {
+			// Adds score to player
 			addScoreToPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].currentScore);
+			// set the solved letters	
 			var slots = getLetterSlots(currentWord, data.letter);
-			console.log(slots);
 			slots.forEach((slot) => {
 				serverData.roomList[data.RID].solved[slot[0]] = slot[1];
 			});
-
+			
+			// scores the player score
 			score = serverData.roomList[data.RID].currentScore;
 
 
 		} else {
+			// Subtracts score * lossModifier from player
 			subtractScoreFromPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].currentScore * serverData.roomList[data.RID].lossModifier);
+			// stores neagtive of the score
 			score = -1 * serverData.roomList[data.RID].currentScore;
 		}
-
+		
+		//Emits the update letter results to the lobby
 		communicate.emitToRoom(data.RID, {
 			"responseType": "letterGuessResults",
 			"playerIndex": currentPlayerIndex,
 			"score": score
 		});
 		
+		// Updates infomation for next turn
 		serverData.roomList[data.RID].usedLetters.push(data.letter);
 		switchToNextPlayer(data.RID);
 		getRandomVowel(currentWord, serverData.roomList[data.RID].solved, data.RID) 
 
+		// checks if the word is solved
 		if(isSolved(currentWord, data.RID)) {
 			await updateGame(data.RID);
 		} else {
-			//TODO: Use UpdateRoom
+			// Emitts the updated room to the lobby
 			communicate.emitToRoom(data.RID, {
 				"responseType": "updateRoom",
 				"room": communicate.formatRoom(serverData.roomList[data.RID])
@@ -637,6 +664,7 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("spinWheel", (data, req) => {
+		// Send a request to the lobby to spin the wheel
 		var currentPlayerIndex = serverData.roomList[data.RID].currentPlayerIndex;
 		serverData.roomList[data.RID].userList[currentPlayerIndex].madeMove = true;
 		communicate.emitToRoom(data.RID, {
@@ -646,10 +674,8 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("newScore", (data, req) => {
-		console.log(data.score);
+		// set new score and updates room
 		serverData.roomList[data.RID].currentScore = data.score;
-
-		//TODO: Use UpdateRoom
 		communicate.emitToRoom(data.RID, {
 			"responseType": "updateRoom",
 			"room": communicate.formatRoom(serverData.roomList[data.RID])
@@ -657,6 +683,7 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("playSound", (data, req) => {
+		// send a request to the lobby to play a sound
 		communicate.emitToRoom(data.RID, {
 			"responseType": "playSound",
 			"soundPath": data.soundPath
@@ -664,22 +691,28 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("solvePuzzle", async (data, req) => {
+		// variable that are commonly used
 		var currentPuzzle = serverData.roomList[data.RID].currentPuzzle;
 		var currentCategory = serverData.roomList[data.RID].currentCategory;
 		var currentWord = getPuzzleWord(currentPuzzle, currentCategory);
 		var currentPlayerIndex = serverData.roomList[data.RID].currentPlayerIndex;
-
+		
+		// sets currentplayer made move to false and switches to the next player
 		serverData.roomList[data.RID].userList[currentPlayerIndex].madeMove = false;
 		switchToNextPlayer(data.RID);
 		
-
+		
+		// checks if the guess was correct or not
 		if(guessIsCorrect(data.guess, currentWord)) {
+			// Adds score to user and update game
 			addScoreToPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].correctScore);
 			await updateGame(data.RID, currentPlayerIndex);
 		} else {
+			// subtract score from user
 			subtractScoreFromPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].correctScore);
 		}
-
+		
+		// updates the lobby with the current toom infomation
 		communicate.emitToRoom(data.RID, {
 			"responseType": "updateRoom",
 			"room": communicate.formatRoom(serverData.roomList[data.RID])
@@ -688,6 +721,7 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("buyVowel", async (data, req) => {
+		// Variables that are commonly used
 		var currentPuzzle = serverData.roomList[data.RID].currentPuzzle;
 		var currentCategory = serverData.roomList[data.RID].currentCategory;
 		var currentWord = getPuzzleWord(currentPuzzle, currentCategory);
@@ -697,11 +731,14 @@ module.exports = (requestHandler) => {
 		var slots = getLetterSlots(currentWord, vowel);
 		var playerName = serverData.roomList[data.RID].userList[serverData.roomList[data.RID].currentPlayerIndex].Name;
 		
+		// subtract the price of a vowel from the user score
 		subtractScoreFromPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].vowelPrice);
+		// set the vowel to solved 
 		slots.forEach((slot) => {
 			serverData.roomList[data.RID].solved[slot[0]] = slot[1];
 		});
 
+		// Updates room infomation
 		serverData.roomList[data.RID].usedLetters.push(vowel);
 		switchToNextPlayer(data.RID);
 		getRandomVowel(currentWord, solved, data.RID);
@@ -709,7 +746,8 @@ module.exports = (requestHandler) => {
 			"responseType": "updateRoom",
 			"room": communicate.formatRoom(serverData.roomList[data.RID])
 		});
-
+	
+		// sends the result of bought 
 		communicate.emitToRoom(data.RID, {
 			"responseType": "boughtVowel",
 			"vowel": vowel,
@@ -718,12 +756,15 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("updatePointers", (data, req) => {
+		// Finds the users index
 		var foundIndex = serverData.roomList[data.RID].userList.findIndex(u => u.UID === data.user.UID);
 		if (foundIndex !== -1) {
+			// updates the mouse positions
 			serverData.roomList[data.RID].userList[foundIndex].mouseX = data.user.mouseX;    
 			serverData.roomList[data.RID].userList[foundIndex].mouseY = data.user.mouseY;    
 		}
-
+		
+		// updates everyone in the room
 		communicate.emitToRoom(data.RID, {
 			"responseType": "updateRoom",
 			"room": communicate.formatRoom(serverData.roomList[data.RID])
@@ -731,11 +772,15 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("updateUserStatus", (data, req) => {
+		// Finds users index
 		var foundIndex = serverData.roomList[data.RID].userList.findIndex(u => u.UID === data.user.UID);
+		
 		if (foundIndex !== -1) {
+			// updates the users in game status
 			serverData.roomList[data.RID].userList[foundIndex].inGame = data.user.inGame;    
 		}
-
+	
+		// updates lobby with new room info
 		communicate.emitToRoom(data.RID, {
 			"responseType": "updateRoom",
 			"room": communicate.formatRoom(serverData.roomList[data.RID])
@@ -744,6 +789,7 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("getInitRoom", (data, req) => {
+		// ends startup request to lobby
 		communicate.emitToRoom(data.RID, {
 			"responseType": "startUp",
 			"room": communicate.formatRoom(serverData.roomList[data.RID])
@@ -751,17 +797,22 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("leaveGame", (data, req) => {
+		// finds user index
 		var foundIndex = serverData.roomList[data.RID].userList.findIndex(u => u.UID === data.user.UID);
+
 		if (foundIndex !== -1) {
+			// sets in game status
 			serverData.roomList[data.RID].userList[foundIndex].inGame = data.user.inGame;    
 		}
 
+		// If no players are left in lobby chnage status to waiting else switch to next player
 		if (!hasPlayersLeftInGame(data.RID)) {
 			serverData.roomList[data.RID].status = "Waiting"
 		} else if (serverData.roomList[data.RID].userList[serverData.roomList[data.RID].currentPlayerIndex].UID === data.user.UID) {
 			switchToNextPlayer(data.RID);
 		}
 
+		// updates the room with new info
 		communicate.emitToRoom(data.RID, {
 			"responseType": "updateRoom",
 			"room": communicate.formatRoom(serverData.roomList[data.RID])
@@ -769,6 +820,7 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("showSolveAttempt", (data, req) => {    
+		// tell all clients to show the solve attempt
 		communicate.emitToRoom(data.RID, {
 			"responseType": "showSolveAttempt",
 			"value": data.value

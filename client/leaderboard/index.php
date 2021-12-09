@@ -53,21 +53,22 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
 		<script src="../src/js/Leaderboard.js"></script>
 		<script src="../src/js/Keyboard.js"></script>
+		<script src="../src/js/leaderboard.js"></script>
 		<link rel="stylesheet" href="../src/style.css">
 		<title>Wheel of Fortune</title>
 	</head>
 
 	<body align="center">
 		<a class="btn btn-dark" href="../" role="button">Back</a>
-
+		<input class="input-group-text" href="../" onkeyup = "updateSearch(this)"></input>
 		<div id="lobby-view-container">
 			<table id="lobby-table">
 			<tbody>
 			<tr style="text-decoration: underline; text-align: center">
-				<td>Username</td>
-				<td>Single-Player Score</td>
-				<td>Mutli-Player Highscore</td>
-				<td>Mutli-Player Win-Lose Ratio</td>
+				<td onclick = "sortByUsername()">Username</td>
+				<td onclick = "sortByScore()">Single-Player Score</td>
+				<td onclick = "sortByHighScore()">Mutli-Player Highscore</td>
+				<td onclick = "sortByWinRatio()">Mutli-Player Win-Lose Ratio</td>
 			</tr>    
 				<?php
 					$userData = getUserData();

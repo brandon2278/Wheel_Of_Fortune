@@ -27,7 +27,6 @@ let pool = mySql.createPool( {
 async function getTables() {
 	return await new Promise((resolve, reject) => {
 		pool.query("SHOW TABLES", (err, res) => {
-			console.log("Before: ", res);
 			res = res.filter((e) => (
 				e.Tables_in_sql5441723 != 'users' && 
 				e.Tables_in_sql5441723 != 'phraseID' && 
@@ -37,7 +36,6 @@ async function getTables() {
 				e.Tables_in_sql5441723 != 'greetings' && 
 				e.Tables_in_sql5441723 != 'numbers'  
 			));
-			console.log("After: ", res);
 			resolve(res);
 		});
 	});
