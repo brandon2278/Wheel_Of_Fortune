@@ -9,7 +9,6 @@ function getUserInfomation() {
 		"leftGameTime": -1,
 		"isLeader": false,
 		"isReady": false,
-		"hasStarted": false,
 		"score": 0,
 		"mouseX": 0,
 		"mouseY": 0,

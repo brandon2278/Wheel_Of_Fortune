@@ -1,6 +1,8 @@
 <?php
 
-$serverName = "sql5.freemysqlhosting.net";
-$dbUsername = "sql5441723";
-$dbPassword = "zkZfThlgHa";
-$dbName = "sql5441723";
+$serverName = "localhost:3306";
+$dbUsername = "group11";
+$dbPassword = "SeveralSecond10";
+$dbName = "group11";
+
+
