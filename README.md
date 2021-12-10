@@ -1,5 +1,5 @@
 # CSCI 3428 Software Engineering:  Mi'kmaq Wheel Of Fortune
-This program is a game based on the T.V. show Wheel Of Fortune  which was deisgned to help promote the Mi'kmaq language to youth. The active webpage can viewed <a href=http://ugdev.cs.smu.ca/~group11/>here</a> .  
+This program is a game based on the T.V. show Wheel Of Fortune  which was deisgned to help promote the Mi'kmaq language to youth. The active webpage can viewed <a href=http://ugdev.cs.smu.ca/~group11/>here</a> . It's also important to note that this app is designed for an http server and the mutiplayer won't work if host on a https in it's current state.  
 
 ## Installation
 The program requires the following dependencies.
