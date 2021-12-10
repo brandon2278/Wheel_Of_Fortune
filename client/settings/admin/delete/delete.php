@@ -21,7 +21,7 @@ session_start();
 <?php
 if (isset($_SESSION['Id'])) {
 	if ($_SESSION['Id'] !==  1) {
-		header("Location: ../index.php?access=denied");
+		header("Location: ../../../?access=denied");
 		exit();
 	}
 }
