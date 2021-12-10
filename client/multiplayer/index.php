@@ -1,3 +1,9 @@
+<!--
+	This file contains the code for the select lobby page
+
+	@author Colby O'Keefe (A00428974)
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 

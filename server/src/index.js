@@ -33,5 +33,5 @@ app.ws("/", (ws, req) => {
 	});    
 });
 
-// Listens on port 8010 currently
-app.listen(8010);
+// Listens on port 6969 currently
+app.listen(6969);

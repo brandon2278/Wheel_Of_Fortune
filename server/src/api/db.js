@@ -6,15 +6,16 @@
  */
 
 // Requires
-let mySql = require('mysql')
+let mySql = require('mysql2')
 
 // Creates a pool
 let pool = mySql.createPool( {
 	connectionLimit: 10,	
-	host: 'sql5.freemysqlhosting.net',
-	user: 'sql5441723',
-	password: 'zkZfThlgHa',
-	database: 'sql5441723',
+	host: '127.0.0.1',
+	port: 3306,
+	user: 'group11',
+	password: 'SeveralSecond10',
+	database: 'group11',
 	charset: 'latin1_swedish_ci'
 });
 
@@ -28,13 +29,13 @@ async function getTables() {
 	return await new Promise((resolve, reject) => {
 		pool.query("SHOW TABLES", (err, res) => {
 			res = res.filter((e) => (
-				e.Tables_in_sql5441723 != 'users' && 
-				e.Tables_in_sql5441723 != 'phraseID' && 
-				e.Tables_in_sql5441723 != 'securityTest' &&
-				e.Tables_in_sql5441723 != 'food' && 
-				e.Tables_in_sql5441723 != 'earth' && 
-				e.Tables_in_sql5441723 != 'greetings' && 
-				e.Tables_in_sql5441723 != 'numbers'  
+				e.Tables_in_group11 != 'users' && 
+				e.Tables_in_group11 != 'phraseID' && 
+				e.Tables_in_group11 != 'securityTest' &&
+				e.Tables_in_group11 != 'food' && 
+				e.Tables_in_group11 != 'earth' && 
+				e.Tables_in_group11 != 'greetings' && 
+				e.Tables_in_group11 != 'numbers'  
 			));
 			resolve(res);
 		});

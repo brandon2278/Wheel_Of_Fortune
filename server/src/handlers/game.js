@@ -77,22 +77,22 @@ async function getRandomCategory(RID) {
 	var index = Math.floor(Math.random() * (categories.length));
 	
 	// Checks if the category was already used in this room the next avaiable category is taken
-	if (serverData.roomList[RID].usedCategories.includes(categories[index].Tables_in_sql5441723)) {
+	if (serverData.roomList[RID].usedCategories.includes(categories[index].Tables_in_group11)) {
 		for (var i = 0; i < categories.length; i++) {
 			if (i === index) continue;
-			if(!serverData.roomList[RID].usedCategories.includes(categories[i].Tables_in_sql5441723)) {
+			if(!serverData.roomList[RID].usedCategories.includes(categories[i].Tables_in_group11)) {
 				index = i;
 				break;
 			}
 
 			// If all category was already resets the used category list 
-			if (i === categories.length - 1) serverData.roomList[RID].usedCategories = [categories[index].Tables_in_sql5441723];
+			if (i === categories.length - 1) serverData.roomList[RID].usedCategories = [categories[index].Tables_in_group11];
 		}
 	}
 	
 	// Add the categories to the used category list
-	serverData.roomList[RID].usedCategories.push(categories[index].Tables_in_sql5441723);
-	return categories[index].Tables_in_sql5441723;
+	serverData.roomList[RID].usedCategories.push(categories[index].Tables_in_group11);
+	return categories[index].Tables_in_group11;
 }
 
 /*

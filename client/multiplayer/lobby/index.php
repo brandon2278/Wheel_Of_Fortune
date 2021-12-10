@@ -1,3 +1,9 @@
+<!--
+	This file contains the code for the lobby page
+
+	@author Colby O'Keefe (A00428974)
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <?php session_start();?>

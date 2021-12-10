@@ -10,7 +10,7 @@
 const SERVER_TIMEOUT = 3000
 
 // Opens a new connection to the NodeJS server  
-let ws = new WebSocket("ws://127.0.0.1:8010");
+let ws = new WebSocket("ws://ugdev.cs.smu.ca:6969");
 
 // Variables to store the users current room structure and it's ID
 var currentRoom = null;
