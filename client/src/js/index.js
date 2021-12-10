@@ -1,5 +1,5 @@
 /**
- * Logic For Single-player game 
+ * Logic For single-player game 
  *
  * @author Brandon Catwright
  */

@@ -18,16 +18,17 @@ const MAX_TIMEOUT = 10000;
 // Checks for dissconnected WebSockets every 5s
 const CHECK_DISCONNECTS_EVERY = 5000
 
+// Checks for players that timeed out on a interval
 setInterval(() => {
 	checkForTimeouts();
 }, CHECK_DISCONNECTS_EVERY);
 
 
 /*
+ * This functiom checks if the current player of each room has timeout 
+ * passed the maxiumum timeout time.
  *
- *
- *
- *
+ * @author Colby O'Keefe (A00428974)
  */
 function checkForTimeouts() {
 	for(let RID in serverData.roomList) {
@@ -126,7 +127,6 @@ async function getRandomPuzzle(category, RID) {
 
 	// Adds puzzle to used puzzles list
 	serverData.roomList[RID].usedPuzzles.push(getPuzzleWord(puzzles[index], category));
-	console.log(puzzles[index]);
 	return puzzles[index];
 }
 
@@ -631,8 +631,9 @@ async function initGame(data) {
 }
 
 /*
+ * This function check if all users in a list had request to start the game or not
  *
- *
+ * @param userList A list of users to check
  * @author Colby O'Keefe (A00428974)
  */
 function hasAllPlayersStarted(userList) {
@@ -756,7 +757,12 @@ module.exports = (requestHandler) => {
 		var currentCategory = serverData.roomList[data.RID].currentCategory;
 		var currentWord = getPuzzleWord(currentPuzzle, currentCategory);
 		var currentPlayerIndex = serverData.roomList[data.RID].currentPlayerIndex;
-		
+		var roundMax = serverData.roomList[data.RID].maxNumberOfRounds;
+		var puzzleMax = serverData.roomList[data.RID].puzzlesPerRound;
+		var roundNum = serverData.roomList[data.RID].currentRound;
+		var puzzleNum = serverData.roomList[data.RID].currentPuzzleNumber;
+	
+
 		// sets currentplayer made move to false and switches to the next player
 		serverData.roomList[data.RID].userList[currentPlayerIndex].madeMove = false;
 		switchToNextPlayer(data.RID);
@@ -774,14 +780,15 @@ module.exports = (requestHandler) => {
 			winMessage = "Incorrectly";
 		}
 		
-		// Shows result from solve attempt
-		communicate.emitToRoom(data.RID, {
-			"responseType": "showSolveResult",
-			"solvedBy": serverData.roomList[data.RID].userList[currentPlayerIndex],
-			"winState": winMessage,
-			"value": data.guess
-		});
-
+		if (!(roundNum === roundMax && puzzleNum === puzzleMax) && !(puzzleNum === puzzleMax)) {
+			// Shows result from solve attempt if the macth has not ended
+			communicate.emitToRoom(data.RID, {
+				"responseType": "showSolveResult",
+				"solvedBy": serverData.roomList[data.RID].userList[currentPlayerIndex],
+				"winState": winMessage,
+				"value": data.guess
+			});
+		}
 		// updates the lobby with the current toom infomation
 		communicate.emitToRoom(data.RID, {
 			"responseType": "updateRoom",

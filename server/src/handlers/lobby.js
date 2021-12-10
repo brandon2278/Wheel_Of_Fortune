@@ -304,6 +304,7 @@ module.exports = (requestHandler) => {
 	});
 
 	requestHandler.on("checkIfValidRID", (data, req) => {
+		// Checks if the RID is valid
 		const packet = {
 			"responseType": "validifyRIDResult",
 			"isValid": data.RID in serverData.roomList

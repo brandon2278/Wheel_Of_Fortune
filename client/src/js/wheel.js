@@ -1,3 +1,10 @@
+/**
+ * This file contains the definition and logic 
+ * for the Wheel in for single-player
+ *
+ * @author Brandon Catwright
+ */
+
 let theWheel = new Winwheel({
 	'numSegments': 13, // Specify number of segments.
 	'outerRadius': 195, // Set outer radius so wheel fits inside the background.

@@ -73,7 +73,8 @@ serverCallbacks.addEventListener("startCountdown", async (e) => {
 	await countdown(1000, "Starting!!!");
 	const packet = {
 		"requestType": "startGame",
-		"RID": RID
+		"RID": RID,
+		"user": user
 	}
 	ws.send(JSON.stringify(packet));
 });
@@ -425,6 +426,7 @@ function startGame() {
  * Runs when the WebSocket connection is opened
  */
 ws.onopen = () => {
+	// Sends a request to checks if the user is in a valid room
 	const packet = {
 		"requestType": "checkIfValidRID",
 		"RID": RID

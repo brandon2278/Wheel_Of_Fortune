@@ -1,6 +1,22 @@
+/**
+ * This file contains the client side code for the game logic
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
+
+// Defines the min number of slots on the baord
+const MIN_SLOTS = 42;
+// Defines the number of row on the board
+const BOARD_ROW_LENGTH = 14;
+
+// Stores if the game has been started yet or not
 var hasStarted = false;
 
+/*
+ * Listenrs for when the html loads 
+ */
 document.addEventListener("DOMContentLoaded", () => {
+	// Sets up the message box
 	messageBox = document.getElementById("game-panel-chat");
 	messageBox.addEventListener("keydown", (e) => {
 		if (e.key === "Enter") {
@@ -9,22 +25,33 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}); 
 
+	// sets up the letters for the game board
 	var keys = document.querySelectorAll(".keyboard-letters");
 	keys.forEach((key) => {
+		// plays clicking audio upon clicking a letter key
 		key.addEventListener("click", () => {
 			let audio = new Audio("../../assets/audio/Clicking.mp3");
 			audio.play();
 			checkLetter(key.innerText);
 		});
+		// removes the color property to be set later
 		key.style.removeProperty('color');
 	});
-
+	
+	// Removes all used letters if the current toom infomation is set
 	if (currentRoom != null) removeUsedLetters();
 });
 
+/*
+ * Listens for a mouse move event
+ */
 document.addEventListener('mousemove', (e) => {
+	// Checks if the users game started
 	if (hasStarted) {
+		// Updates the users mouse position
 		updateMousePosition(e); 
+
+		// Sends the users mouse infomation to the server
 		const packet = {
 			"requestType": "updatePointers",
 			"RID": RID,
@@ -35,10 +62,17 @@ document.addEventListener('mousemove', (e) => {
 	}
 });
 
+/*
+ * Listens for an unload event
+ */
 window.addEventListener('beforeunload', (e) => {
+	// checks if the users game started 
 	if (hasStarted) {
+		// sets the user property
 		user.inGame = false;
 		user.madeMove = false;
+
+		// sends a timeout request to the server
 		const packet = {
 			"requestType": "startTimeout",
 			"RID": RID,
@@ -49,73 +83,116 @@ window.addEventListener('beforeunload', (e) => {
 	}
 }, false);
 
+/*
+ * Process the new room data from server
+ */
 serverCallbacks.addEventListener("getRoom", (e) => {
 	const data = e.detail;
+
 	updateRoom(data);
 });
 
+/*
+ * Spins the wheel upon request from the server
+ */
 serverCallbacks.addEventListener("spinWheel", (e) => {
 	const data = e.detail;
+
 	var wheelContainer = document.getElementById("myModal");
 	wheelContainer.style.display = "block";
+
 	startSpin(data.stopAngle);
 
 });
 
+/*
+ * Switches puzzle upon server request
+ */ 
 serverCallbacks.addEventListener("nextPuzzle", (e) => {
 	const data = e.detail;
+
 	currentRoom = data.room;
+
 	displaySolvedDetails(data.solvedBy).then(() => {
 		displayNextPlayer();
 	});
-	resetPuzzle(data.slots);
+
+	resetPuzzle();
 	InitPuzzle(); 
 	updateRoom(data);    
 });
 
+/*
+ * Switches to next round upon server request
+ */
 serverCallbacks.addEventListener("nextRound", (e) => {
 	const data = e.detail;
+
 	currentRoom = data.room;
+
 	displayNextRound(data.solvedBy);
-	resetPuzzle(data.slots);
+	resetPuzzle();
 	InitPuzzle(); 
 	updateRoom(data);    
 });
 
+/*
+ * Ends the current match upon server request
+ */
 serverCallbacks.addEventListener("endMatch", async (e) => {
+	const data = e.detail;
+
 	var audio = new Audio("../../assets/audio/winGame.mp3");
 	audio.play();
-	const data = e.detail;
+
 	await displayWinner(data.solvedBy, data.winningPlayer, data.winningScore);
 });
 
+/*
+ * Plays a sound upon server request
+ */
 serverCallbacks.addEventListener("playSound", (e) => {
 		const data = e.detail;
+
 		var audio = new Audio(data.soundPath);
 		audio.play();
-		
 });
 
+/*
+ * Display results from a users letter guess 
+ */
 serverCallbacks.addEventListener("letterGuessResults", (e) => {
 	const data = e.detail;
-	console.log("outFunction", data.score);
+
 	displayScoreChange(data.playerIndex, data.score).then(() => {
 		displayNextPlayer();
 	});
 });
 
+/*
+ * Starts the game upon callback from server 
+ */
 serverCallbacks.addEventListener("startUp", (e) => {
 	const data = e.detail;
+
 	currentRoom = data.room;
+
 	resetPuzzle();
 	InitPuzzle();
+
 	if (!hasStarted) displayNextPlayer();
+
 	hasStarted = true;
 	updateRoom(data);
 });
 
+/*
+ * Display the current user solve attempt live
+ */
 serverCallbacks.addEventListener("showSolveAttempt", (e) => {
 	const data = e.detail;
+
+	// Checks if the user is the current player or not
 	if (user.UID !== currentRoom.userList[currentRoom.currentPlayerIndex].UID) {
 		swal({
 			title: currentRoom.userList[currentRoom.currentPlayerIndex].Name + " Is Solving The Puzzle: ",
@@ -130,8 +207,33 @@ serverCallbacks.addEventListener("showSolveAttempt", (e) => {
 	}
 });
 
+/*
+ * Displays the results from a attempt to solve the puzzle
+ */
+serverCallbacks.addEventListener("showSolveResult", (e) => {
+	const data = e.detail;
+
+	swal({
+		title: data.solvedBy.Name + " Solved The Puzzle " + data.winState,
+		content: {
+			element: "span",
+			attributes: {
+				innerHTML: data.value
+			}
+		},
+		buttons: false,
+		timer: 3000
+	}).then(() => {
+		displayNextPlayer();
+	});
+})
+
+/*
+ * Displays the vowel bought and the user who bought it
+ */
 serverCallbacks.addEventListener("boughtVowel", (e) => {
 	const data = e.detail;
+
 	displayBoughtVowel(data.vowel, data.player).then(() => {
 		displayNextPlayer();
 	});
@@ -140,12 +242,19 @@ serverCallbacks.addEventListener("boughtVowel", (e) => {
 /*
  * Inits the game upon go ahead from server
  *
- * @author Colby  O'Keefe (A00428974)
+ * @author Colby O'Keefe (A00428974)
  */
 function init() {
+	// gets the user infomation for database
 	user = getUserInfomation();
+
+	// Sets the in game flag
 	user.inGame = true;
+
 	joinRoom(RID);
+
+	// sends a reuqest to init the room and to update user staus to
+	// the server
 	const packet = {
 		"requestType": "getInitRoom",
 		"RID": RID
@@ -155,10 +264,16 @@ function init() {
 		"RID": RID,
 		"user": user
 	};
+
 	ws.send(JSON.stringify(packet));
 	ws.send(JSON.stringify(packet2));
 }
 
+/**
+ * Swaps the display mode for the infomation window
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
 function displayGameInfoWindow() {
 	var gamePanel = document.getElementById("game-panel");
 
@@ -166,14 +281,30 @@ function displayGameInfoWindow() {
 	else gamePanel.style.display = "none";
 }
 
+/**
+ * Displays whos turn it is
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
 function updateUsersGameInfo() {
 	var container = document.getElementById("user-game-info");
 	container.innerHTML = "";
+
 	var player = document.createElement("p");
 	player.innerHTML = "Playing: " + currentRoom.userList[currentRoom.currentPlayerIndex].Name;
+
 	container.appendChild(player);
 }
 
+/**
+ * This function displays a letter to the user.
+ * Used to display when a user bought a vowel
+ *
+ * @param vowel The letter to display
+ * @param name The name of the user who bought the vowel
+ * @return A Promise 
+ * @author Colby O'Keefe (A00428974)
+ */
 async function displayBoughtVowel(vowel, name) {
 	return await new Promise((res, rej) => {
 		swal({
@@ -186,6 +317,11 @@ async function displayBoughtVowel(vowel, name) {
 	});
 }
 
+/**
+ * This function display the current player in an alert box
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
 function displayNextPlayer() {
 	swal({
 		title: "It's Now " + currentRoom.userList[currentRoom.currentPlayerIndex].Name + "'s Turn",
@@ -194,6 +330,11 @@ function displayNextPlayer() {
 	});
 }
 
+/**
+ * This function remove the user from the game and back to the lobby
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
 function leaveGame() {
 	document.location.href = "../lobby/?RID=" + RID;
 	user.inGame = false;
@@ -208,16 +349,28 @@ function leaveGame() {
 
 }
 
+/**
+ * Displays the current plays mouse to the screen
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
 function displayUsersMouse() {    
+	// Loops through all users in the room
 	currentRoom.userList.forEach( (u) => {
+		// Finds the users mouse pointer
 		var mousePointer = document.getElementById("UID=" + u.UID);
+
+		// Removes the mouse pointer object if the user is not in the game
 		if (u.inGame === false) {
 			if (mousePointer !== null) mousePointer.remove();
 			return;
 		}
+
+		// Gets the mouses mouse position (x, y)
 		var mouseX = u.mouseX;
 		var mouseY = u.mouseY;
-		//TODO: Only make new element when new user joins.
+
+		// Create a new mouse pointer element if it does not exist already
 		if (mousePointer ==  null) {
 			mousePointer = document.createElement("span");
 			mousePointer.id = "UID=" + u.UID;
@@ -229,21 +382,37 @@ function displayUsersMouse() {
 			mousePointer.appendChild(nameTag);
 			document.getElementById("game-body").appendChild(mousePointer);
 		}
+		// stores if the mouse is visible
 		var visible;
+		// checks if the user is the current player or not
 		if (u.UID === currentRoom.userList[currentRoom.currentPlayerIndex].UID && u.UID !== user.UID) {
 			visible = "visible";    
 		} else {
 			visible = "hidden";
 		}
+
+		// This is sus but never had time to fix it
 		mousePointer.style = "background-color: " + u.pointerColor + "; visibility: " + visible + "; margin-left: auto; margin-right: 0; pointer-events: none; position: absolute; left: " + mouseX + "px; top: " + mouseY + "px;";
 	});
 }
 
+/**
+ * Updates the users mouse infomation
+ * 
+ * @param e An event
+ * @author Colby O'Keefe (A00428974)
+ */
 function updateMousePosition(e) {
 	user.mouseX = e.clientX;
 	user.mouseY = e.clientY;
 }
 
+/**
+ * Displays the winner of the match to the users in the game.
+ * 
+ * @return A Promise
+ * @author Colby O'Keefe (A00428974)
+ */
 async function displayWinner(solvedBy, winner, score) {
 	return await new Promise ( (res, rej) => { 
 		swal({
@@ -264,6 +433,11 @@ async function displayWinner(solvedBy, winner, score) {
 	});
 }
 
+/**
+ * Displays the game infomation in the game info panel
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
 function displayGameInfo() {
 	var info = document.getElementById("game-panel-info");
 	info.innerHTML = "";
@@ -293,6 +467,11 @@ function displayGameInfo() {
 	info.appendChild(lossPercent);
 }
 
+/**
+ * Displays the users in the game
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
 function displayUsers() {
 	var userListContainer = document.getElementById("game-panel-users");
 	userListContainer.innerHTML = "";
@@ -319,6 +498,12 @@ function displayUsers() {
 
 }
 
+/**
+ *  Handles chnage tab logic on the infomation menu
+ *
+ * @param tab The tab to be changed
+ * @author Colby O'Keefe (A00428974)
+ */
 function gamePanelChangeTab(tab) {
 	let audio = new Audio("../../assets/audio/Clicking.mp3");
 	audio.play();
@@ -331,9 +516,14 @@ function gamePanelChangeTab(tab) {
 
 	tabs[tab].classList.add("game-panel-tab-selected");
 	contentAreas[tab].style.display = "block";
-	console.log(contentAreas);
 }
 
+/**
+ * Display the next round infomation to the user via an alert box
+ * 
+ * @param solvedBy the user who solved the puzzle
+ * @author Colby O'Keefe (A00428974) 
+ */
 async function displayNextRound(solvedBy) {
 	swal({
 		title: solvedBy + " Solved The Final Puzzle Earning $" + currentRoom.correctScore,
@@ -350,9 +540,20 @@ async function displayNextRound(solvedBy) {
 	});
 }
 
+/**
+ * This function display when a users score changes 
+ *
+ * @param player The player who score changed
+ * @param score The score the player earned/loss
+ * @return A Promise 
+ * @author Colby O'Keefe (A00428974)
+ */
 async function displayScoreChange(player, score) {
 	var windowTitle;
 	var audioPath;
+
+	// determine weather the score should be add or  subtracted or
+	// if a bankrupt had occured
 	if (score >= 0 && !isNaN(score))  {
 		windowTitle = currentRoom.userList[player].Name + " Has Gained " + score;
 		audioPath = "../../assets/audio/ding.mp3";
@@ -364,7 +565,8 @@ async function displayScoreChange(player, score) {
 		windowTitle = currentRoom.userList[player].Name + " Has Lost All Their Score";
 		audioPath = "../../assets/audio/buzz.mp3";
 	}
-
+	
+	// Sends a request to play the win or losing sound
 	const packet = {
 		"requestType": "playSound",
 		"RID": RID,
@@ -384,6 +586,13 @@ async function displayScoreChange(player, score) {
 	});
 }
 
+/**
+ * This function displays who solved a puzzle and how much they earned
+ *
+ * @param solvedBy who solved the puzzle
+ * @return A Promise
+ * @author Colby O'Keefe (A00428974)
+ */
 async function displaySolvedDetails(solvedBy) {
 	return await new Promise((res, rej) => {
 		swal({
@@ -397,23 +606,45 @@ async function displaySolvedDetails(solvedBy) {
 
 }
 
+/**
+ * This function play the audio for the wheel spinning
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
 function playWheelSound() {
 	var audio = new Audio("../../assets/audio/tick.mp3");
 	audio.play();
 }    
 
+/**
+ * Sends a request to the server to check if a letter is in
+ * the puzzles word
+ *
+ * @param letter The letter to be checked
+ * @author Colby O'Keefe (A00428974)
+ */
 function checkLetter(letter) {
+	// checks if the letter was already used just incase
 	if (currentRoom.usedLetters.includes(letter)) return;
-	lettersVisibility()
+
+	lettersVisibility();
+
+	// sends a request to the server to check the guessed letter
 	const packet = {
 		"requestType": "checkLetter",
 		"user": user,
 		"RID": RID,
 		"letter": letter
 	}
+
 	ws.send(JSON.stringify(packet));
 }
 
+/**
+ * Removes all used letters from the board
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
 function removeUsedLetters() {
 	var usedLetters = currentRoom.usedLetters;
 
@@ -424,6 +655,11 @@ function removeUsedLetters() {
 	});
 }
 
+/**
+ * Adds all keys to the game board
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
 function addAllKeys() {
 	var keys = document.querySelectorAll(".keyboard-letters");
 	keys.forEach((key) => {
@@ -431,13 +667,23 @@ function addAllKeys() {
 	});
 }
 
+/**
+ * Finds the number of puzzles slots need to display the word.
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
 function InitPuzzle() {
+	// Finds the number of slots need to repersent a puzzle as a
+	// mutliple of board row length
 	var numLetters = currentRoom.slots[currentRoom.slots.length - 1] + 1;
-	if (numLetters % 14 !== 0) numLetters += 14 - numLetters % 14;
+	if (numLetters % BOARD_ROW_LENGTH !== 0) numLetters += 14 - numLetters % BOARD_ROW_LENGTH;
 
-	if (numLetters < 42) numLetters = 42;
-	console.log(numLetters);
+	// checks if the num slots as been reached
+	if (numLetters < MIN_SLOTS) numLetters = MIN_SLOTS;
+
 	var startLetter = document.getElementById("start-tile");
+
+	// create the slots elements
 	for (var i = 0; i < numLetters; i++) {
 		var container = document.createElement("div");
 		container.classList.add("letter-container", "useable-container");
@@ -451,15 +697,25 @@ function InitPuzzle() {
 	
 }
 
-function resetPuzzle(slots) {
+/**
+ * This function resets the puzzle board
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
+function resetPuzzle() {
 	addAllKeys();
+
 	var letterContainers = document.querySelectorAll(".useable-container");
-	console.log(letterContainers);
 	letterContainers.forEach((container) => {
 		container.remove();
 	});
 }
 
+/**
+ * This function updates the puzzle
+ *
+ * @author Colby O'Keefe *A00428974)
+ */
 function updatePuzzle() {
 	for(var i = 0; i < currentRoom.slots.length; i++) {
 		var letter = document.getElementById(currentRoom.slots[i]);
@@ -471,6 +727,11 @@ function updatePuzzle() {
 	}
 }
 
+/**
+ * Swaps the visibility of the game options
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
 function optionsVisibility() {
 	var currentPlayer = currentRoom.userList[currentRoom.currentPlayerIndex]
 	var optionContainer = document.getElementById("option-container");
@@ -481,6 +742,11 @@ function optionsVisibility() {
 	}
 }
 
+/**
+ * This function swaps the letter buttons visibility
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
 function lettersVisibility() {
 	var currentPlayer = currentRoom.userList[currentRoom.currentPlayerIndex]
 	var keyboardContainer = document.getElementById("keyboard-section");
@@ -492,6 +758,7 @@ function lettersVisibility() {
 }
 
 /*
+ * This function update the room and all HTML elements
  *
  * @author Colby O'Keefe (A00428974)
  */
@@ -533,7 +800,8 @@ function updateRoom(data) {
 }
 
 /*
- *
+ * This function displays an alert box for the user to
+ * enter there solution to the puzzle
  *
  * @author Colby O'Keefe (A00428974)
  */ 
@@ -592,9 +860,9 @@ function solve() {
 }
 
 /*
- *
- *
- *
+ * This function request a random vowel from the server and plays a
+ * clicking sound
+ *  
  * @author Colby O'Keefe (A00428974)
  */ 
 function buyVowel() {
@@ -611,7 +879,7 @@ function buyVowel() {
 }
 
 /*
- *
+ * This function sends a request to the server to spin the wheel
  *
  * @author Colby O'Keefe (A00428974)
  */ 
@@ -629,10 +897,19 @@ function spinWheel() {
 	}
 }
 
+/**
+ * This function sends the result of spinning the wheel to the server
+ * as well as plays audio depending on what the result of the spin was.
+ *
+ * @param indicatedSegment The segment of the wheel landed on
+ * @author Colby O'Keefe (A00428974)
+ */
 function closeWheel(indicatedSegment) {
 	var wonAudioPath = "../../assets/audio/Toss.mp3";
 	var bankruptAudioPath = "../../assets/audio/bankr.mp3";
 	var wheelContainer = document.getElementById("myModal");
+
+	// determine if a score was recevived or if bankrupt
 	if (indicatedSegment.text !== "BANKRUPT") {
 		const packet = {
 			"requestType": "playSound",
@@ -662,11 +939,15 @@ function closeWheel(indicatedSegment) {
 			timer: 3500
 		});
 	}
+
 	wheelContainer.style.display = "none";
+
 	if (user.UID === currentRoom.userList[currentRoom.currentPlayerIndex].UID) {
 		var keyboardContainer = document.getElementById("keyboard-section");
 		keyboardContainer.style.visibility = "visible";
 	}
+
+	// Sends request to server to updates the rooms score
 	const packet = {
 		"requestType": "newScore",
 		"RID": RID,
@@ -677,8 +958,10 @@ function closeWheel(indicatedSegment) {
 }
 
 /*
- *
- *
+ * Displays and starts the spin of the wheel
+ * 
+ * @param The stopping angle for the spin
+ * @author Colby O'Keefe (A00428974)
  */
 function startSpin(stopAngle) {
 	var wheel = createWheel();
@@ -686,6 +969,12 @@ function startSpin(stopAngle) {
 		wheel.startAnimation();
 }
 
+/**
+ * This function sends a request to the server to play
+ * the audio hint for the puzzle.
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
 function displayHint() {
 	var hintButton = document.getElementById("hint");
 	var hint = "../../assets/game/back/" + currentRoom.puzzleHint;
@@ -703,6 +992,12 @@ function displayHint() {
 	}
 }
 
+/**
+ * This function display the question which can be either an audio file or
+ * a picture.
+ * 
+ * @author Colby O'Keefe (A00428974)
+ */
 function displayQuestion() {
 	var questionContainer = document.getElementById("question-container");
 	var img = document.getElementById("question-image");
@@ -716,6 +1011,8 @@ function displayQuestion() {
 	
 	img.style.visibility = "hidden";
 	sound.style.visibility = "hidden";
+	
+	// Check if the file is an audio or a image
 	if(fileType === "jpeg" || fileType === "peg" || fileType === "jpg") {
 		questionTitle.innerHTML = "Image";
 		img.src = question; 
@@ -743,7 +1040,9 @@ function displayQuestion() {
 	}
 }
 
+// Runs on the opening of the WebSocket
 ws.onopen = () => {
+	// Sends a request to checks if the user is in a valid room
 	const packet = {
 		"requestType": "checkIfValidRID",
 		"RID": RID

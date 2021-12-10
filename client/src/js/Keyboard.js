@@ -1,30 +1,34 @@
 /**
- *
- *
+ * This file contains the code for a keyword object that
+ * contains special letters in Mi'kmaw
  *
  * @author Colby O'Keefe (A00428974)
  */
 
+// Defines the last key pressed
 var lastKey = null;
 
+/*
+ * A keyboard object
+ */
 const Keyboard = {
-	elements: {
-		main: null,
-		keysContainer: null,
-		keys: []
+	elements: {													
+		main: null,		// The main container
+		keysContainer: null,	// The container for keys
+		keys: []		// The elements that store the keys within the keyboard
 	},
 
 	eventHandlers: {
-		oninput: null,
-		onclose: null
+		oninput: null,		// Stores an oninput function
+		onclose: null		// Stores an onclose function
 	},
 	
 	properties: {
-		value: "",
-		capsLock: false
+		value: "",		// The value 
+		capsLock: false		// If the keyboard is in caps locks mode or not
 	},
 
-	init() {
+	init() {			// Inits the keyboard object
 		this.elements.main = document.createElement("div");
 		this.elements.keysContainer = document.createElement("div");
 		
@@ -38,21 +42,23 @@ const Keyboard = {
 		document.body.appendChild(this.elements.main);
 	},
 	
-	_createKeys() {
+	_createKeys() {			// Creates the key elements
 		const fragment = document.createDocumentFragment();
+		// Defines the layout of the keyboard
 		const keyLayout = [
 			"caps", "á", "é", "í", "ɨ", "ó", "ú", "backspace",
 			"close", "space"
 		];
 
+		// The icon of the keys
 		const createIcon = (icon_name) => {
 			return `<i class="material-icons">${icon_name}</i>`;
 		};
-
+		
+		// Sets ups key elements for keyboard
 		keyLayout.forEach(key => {
 			const keyElement = document.createElement('button');
 			const breakLine = ['backspace'].indexOf(key) !== -1;
-			
 
 			keyElement.setAttribute("type", "button");
 			keyElement.classList.add("mikmaqKeyboardKey")
@@ -114,13 +120,13 @@ const Keyboard = {
 
 		return fragment;
 	},
-
+	// handles a trigger event for the key board
 	_triggerEvent(handlerName) {
 		if (typeof this.eventHandlers[handlerName] == "function") {
 			this.eventHandlers[handlerName](this.properties.value);
 		}
 	},
-
+	// handles a caps lock toggle
 	_toggleCaps() {
 		this.properties.capsLock = !this.properties.capsLock;
 
@@ -130,14 +136,14 @@ const Keyboard = {
 			}
 		}
 	},
-
+	// opens the keyboard
 	open(initalValue, oninput, onclose) {
 		this.properties.value = initalValue || "";
 		this.eventHandlers.oninput = oninput;
 		this.eventHandlers.onclose = onclose;
 		this.elements.main.classList.remove("mikmaqKeyboard--hidden");
 	},
-	
+	// closes the keyboard
 	close() {
 		this.properties.value = "";
 		this.eventHandlers.oninput = oninput;
@@ -146,9 +152,12 @@ const Keyboard = {
 	}
 };
 
+// Sets up the keyboard on html content loading
 window.addEventListener("DOMContentLoaded", function() {
-	
+	// Inits the keyboard
 	Keyboard.init();
+
+	// adds the keyboard for element with the class useLobbyKeyboard
 	document.querySelectorAll(".useLobbyKeyboard").forEach(element => {
 		element.addEventListener("focus", () => {
 			Keyboard.open("", currentValue => {
@@ -157,20 +166,6 @@ window.addEventListener("DOMContentLoaded", function() {
 			console.log(lastKey);
 			if (lastKey !== "backspace") element.value += next;
 			else element.value = element.value.slice(0, -1);
-			})
-		});
-	});
-
-	document.querySelectorAll(".useGameKeyboard").forEach(element => {
-		element.addEventListener("focus", () => {
-			Keyboard.open("", currentValue => {
-			element.select();
-			let next = currentValue.substr(currentValue.length - 1);
-			if (element.getAttribute("maxlength") > element.value.length) {
-				if (lastKey !== "backspace") element.value += next;
-				else element.value = element.value.slice(0, -1);
-			}
-			else if (lastKey === "backspace") element.value = element.value.slice(0, -1);
 			})
 		});
 	});

@@ -23,7 +23,8 @@ var user = {
 	"closeTime": -1,	// Stores the time since the user lost connect to the server
 	"leftGameTime": -1,	// Stores the time since the user left an active game
 	"isLeader": false,	// Stores if the user is the leader of the lobby
-	"isReady": false,	// Stores if the user has readied up or not
+	"isReady": false,	// Stores if the user has readied up or not,
+	"hasStarted": false,	// Stores if the user has started or not
 	"mouseX": 0,		// Stores the users mouse x position
 	"mouseY": 0,		// Stores the user mouse y position
 	"inGame": false,	// Stores if the user is in a game or not

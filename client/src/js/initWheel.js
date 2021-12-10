@@ -1,3 +1,14 @@
+/**
+ * This file defines the wheel for mutli-player
+ *
+ * @author Colby O'Keefe (A00428974)
+ */
+
+/**
+ * This function create a new wheel object
+ * @return A new wheel object  
+ * @author Colby O'Keefe (A00428974)
+ */ 
 function createWheel() {
 	return new Winwheel({
 	    'numSegments': 13, // Specify number of segments.
