@@ -697,7 +697,7 @@ module.exports = (requestHandler) => {
 			// Subtracts score * lossModifier from player
 			subtractScoreFromPlayer(currentPlayerIndex, data.RID, serverData.roomList[data.RID].currentScore * serverData.roomList[data.RID].lossModifier);
 			// stores neagtive of the score
-			score = -1 * serverData.roomList[data.RID].currentScore;
+			score = -1 * serverData.roomList[data.RID].lossModifier * serverData.roomList[data.RID].currentScore;
 		}
 		
 		//Emits the update letter results to the lobby

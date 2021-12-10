@@ -1020,8 +1020,8 @@ function displayQuestion() {
 	if(fileType === "jpeg" || fileType === "peg" || fileType === "jpg") {
 		questionTitle.innerHTML = "Image";
 		img.src = question; 
-		img.style.height = '30%';
-		img.style.width = '30vw';
+		img.style.height = '250px';
+		img.style.width = '300px';
 		img.style.border = '1vw ridge rgba(0, 0, 0, 0.5)';
 		img.style.borderRadius = '10%';
 		img.style.visibility = "visible";

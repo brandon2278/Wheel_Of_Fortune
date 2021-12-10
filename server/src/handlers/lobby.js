@@ -277,6 +277,7 @@ module.exports = (requestHandler) => {
 
 	requestHandler.on("checkLobbyPassword", (data, req) => {
 		// check if the clinet entered the current lobby password
+		if (!(data.RID in serverData.roomList)) return;
 		var passwordIsCorrect = data.passwordAttempt === serverData.roomList[data.RID].password;
 		// sends password check results back to client
 		const packet = {
