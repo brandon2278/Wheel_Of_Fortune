@@ -66,7 +66,7 @@ if (isset($_SESSION['Id'])) {
 								</form>
 								<div>
 									<p class="info">Make sure the input fields do not contain special characters such as !/'_. and no compound words such as I'm use I am.</p>
-									<a href="../upload.php">Choose Another Category</a>
+									<a href="./">Choose Another Category</a>
 								</div>
 							</div>
 						</div>
