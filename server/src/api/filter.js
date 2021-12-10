@@ -57,12 +57,12 @@ function filterMessage(message) {
  *
  * @parm str String to check if it has a bad word
  * @return True if the string contains a bad word and false otherwise
- * @author Colby O'Keefe
+ * @author Colby O'Keefe (A00428974)
  */
 function containsBadWords(str) {
 	let found = false;
 	badWords.forEach(word => {
-		if (str.toUpperCase().includes(word).toUpperCase())
+		if (str.toUpperCase().includes(word.toUpperCase()))
 			found = true;
 	});
 	return found;
