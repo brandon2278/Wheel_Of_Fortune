@@ -127,7 +127,6 @@ async function getRandomPuzzle(category, RID) {
 
 	// Adds puzzle to used puzzles list
 	serverData.roomList[RID].usedPuzzles.push(getPuzzleWord(puzzles[index], category));
-	console.log(puzzles[index]);
 	return puzzles[index];
 }
 
