@@ -54,7 +54,7 @@ Now the project can be ran and used on a html server.
 ## Features
 
 ### Singleplayer
-The app features a single player mode with 6 puzzle categories you can choose from which are as follows.
+The app features a single player mode with 6 puzzle categories you can choose from, which are as follows.
 <ul>
 <li>Animals</li>
 <li>Greetings</li>
