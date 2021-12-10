@@ -10,7 +10,7 @@ The program requires the following dependencies.
 <li><a href="https://www.npmjs.com/package/mysql2">mysql2</a></li>
 </ol>
 Note that these don't have to be install directly It will be discussed how to download these later in this section, however the install will make use of the npm package manger.
-
+<br></br>
 The software can be setup as follows.
 <ol>
 <li>
