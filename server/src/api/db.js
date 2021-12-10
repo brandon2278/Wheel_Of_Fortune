@@ -64,10 +64,10 @@ async function getPuzzles(table) {
  * @param winnerUID The Id of the winning player
  * @author Colby O'Keefe (A00428974)
  */
-async function updateStats(userList, winnerUID) {
+function updateStats(userList, winnerUID) {
 
-	userList.forEach(async (user) => {
-		await pool.query("SELECT * FROM users WHERE id=" + user.UID, async (err, res) => {
+	userList.forEach((user) => {
+		pool.query("SELECT * FROM users WHERE id=" + user.UID, async (err, res) => {
 			var sql = "UPDATE users SET ";
 			if (res[0].highscore < user.score) {
 				// Update highscore 
@@ -82,7 +82,7 @@ async function updateStats(userList, winnerUID) {
 
 			sql += " WHERE id = " + user.UID + ";";
 
-			await pool.query(sql, (err, res) => {
+			pool.query(sql, (err, res) => {
 			});
 		});
 	});

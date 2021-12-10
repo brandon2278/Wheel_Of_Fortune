@@ -282,7 +282,7 @@ function displayGameInfoWindow() {
 }
 
 /**
- * Displays whos turn it is
+ * Displays whos turn it is and the users score
  * 
  * @author Colby O'Keefe (A00428974)
  */
@@ -293,7 +293,11 @@ function updateUsersGameInfo() {
 	var player = document.createElement("p");
 	player.innerHTML = "Playing: " + currentRoom.userList[currentRoom.currentPlayerIndex].Name;
 
+	var score = document.createElement("p");
+	score.innerHTML = "Your Score: $" + user.score;
+
 	container.appendChild(player);
+	container.appendChild(score);
 }
 
 /**

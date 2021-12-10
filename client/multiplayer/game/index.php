@@ -76,6 +76,10 @@
 	<div id="screen-cover"> </div>
 
 		<h3 id="question-container">
+
+			<span id="user-game-info">
+			</span>
+
 			<span id="user-game-info">
 			</span>
 			<span id="question-title"></span>

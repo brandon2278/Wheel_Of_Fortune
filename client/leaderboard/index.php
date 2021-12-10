@@ -18,7 +18,7 @@
 		while($row = $users->fetch_assoc()) {
 			$winRatio = $row['matchesWon'];
 			if ($row['matchesLose'] != 0) {
-				$winRatio = $winRatio / $row['matchesLose'];
+				$winRatio = round($winRatio / $row['matchesLose'], 2);
 			}
 			echo "<tr style=\"font-size: 2vw; color: white; text-align: center\">";
 			echo "<td>" . $row["username"] . "</td>";
