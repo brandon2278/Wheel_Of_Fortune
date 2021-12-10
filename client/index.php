@@ -1,3 +1,8 @@
+<!--
+	This file contains the code for the menu page and log-in popup.
+	@author Brandon Catwright (A00430851) 
+-->
+
 <?php
 session_start();
 ?>
