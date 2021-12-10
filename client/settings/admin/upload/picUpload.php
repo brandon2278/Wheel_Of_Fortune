@@ -1,3 +1,8 @@
+<!-- 
+	Upload New Words to Word Categories containing Pictures 
+ 	@author Brandon Catwright (A00430851) 
+-->
+
 <?php
 session_start();
 ?>
@@ -97,7 +102,7 @@ if (isset($_SESSION['Id'])) {
 		if (mysqli_query($con, $query)) {
 			echo "Word Uploaded successfully \n";
 		} else {
-			echo "Error uploading record: " . mysqli_error($conn);
+			echo "Error uploading record: " . mysqli_error($con);
 		}
 
 		$name = $_FILES['picture']['name'];

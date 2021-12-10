@@ -1,3 +1,8 @@
+<!-- 
+	Upload New Words to Categories not containing pictures
+ 	@author Brandon Catwright (A00430851) 
+-->
+
 <?php
 session_start();
 ?>
@@ -93,7 +98,7 @@ if (isset($_SESSION['Id'])) {
 		if (mysqli_query($con, $query)) {
 			echo "Word Uploaded successfully \n";
 		} else {
-			echo "Error uploading record: " . mysqli_error($conn);
+			echo "Error uploading record: " . mysqli_error($con);
 		}
 
 		$audio = $_FILES['sound']['name'];
