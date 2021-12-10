@@ -2,7 +2,7 @@
 This program is a game based on the T.V. show Wheel Of Fortune  which was deisgned to help promote the Mi'kmaq language to youth. The active webpage can viewed <a href=http://ugdev.cs.smu.ca/~group11/>here</a> .  
 
 ## Installation
-To install and run the program, you will require the following dependencies. Note that these don't have to be install directly It will be discussed how to downlaod these laster in this section.
+The program requires the following dependencies. Note that these don't have to be install directly It will be discussed how to downlaod these later in this section, however the install will make use of the npm package manger.
 <ol>
 <li><a href="https://www.npmjs.com/package/express">Express</a></li>
 <li><a href="https://www.npmjs.com/package/express-ws">Express-ws</a></li>
@@ -53,7 +53,7 @@ Now the project can be ran and used on a html server.
 ## Features
 
 ### Singleplayer
-The app features a single player mode with 6 word categories you can choose from which are as follows.
+The app features a single player mode with 6 puzzle categories you can choose from which are as follows.
 <ul>
 <li>Animals</li>
 <li>Greetings</li>
@@ -62,7 +62,7 @@ The app features a single player mode with 6 word categories you can choose from
 <li>Earth</li>
 <li>Numbers</li>
 </ul>
-The mode serves as an endless mode where the goal is to get as many point as you can.
+The mode serves as an endless mode where the goal is to get as many points as you can.
 
 ### Multiplayer
 The app features a multiplayer mode where you can play with other users. Below is a description of each component of the multiplayer.
@@ -84,5 +84,8 @@ Once the game ends their stats are updated to be displayed on the leaderboard.
 ### Leaderboards
 The leaderboards are where you can see the stats for everyone who used the app. You can sort the leaderbaord by drifferent stats by clicking on their respective title. The user can also search for a specific player in the leaderbaord.
 
+### User Accounts
+To use the app the user will have to create an account. An account has a name, username and a 4 digit passcode field that the user will have to fill out. Once a user creates an account they can sign in to the app. 
+
 ### Modifiable Database
-The puzzles in the database can be edited in the program by a user with admin privileges. The admin can add or remove puzzle from the database. The admin can also see a list of the current puzzles in the database.
+The puzzles in the database can be edited within the app by a user with admin privileges. The admin can add or remove puzzle from the database. The admin can also see a list of the current puzzles in the database.
