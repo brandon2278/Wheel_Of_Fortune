@@ -458,9 +458,9 @@ function displayGameInfo() {
 	puzzle.innerHTML = "Puzzle Number: " + currentRoom.currentPuzzleNumber + "/" + currentRoom.puzzlesPerRound;
 	info.appendChild(puzzle);
 	
-	var wheelSpin = document.createElement("p");
-	wheelSpin.innerHTML = "Amount For Vowel: $" + currentRoom.currentScore;
-	info.appendChild(wheelSpin);
+	var vowel = document.createElement("p");
+	vowel.innerHTML = "Amount For Vowel: $" + currentRoom.vowelPrice;
+	info.appendChild(vowel);
 
 	var scoreForCorrect = document.createElement("p");
 	scoreForCorrect.innerHTML = "Score For Correct Guess: $" + currentRoom.correctScore;
