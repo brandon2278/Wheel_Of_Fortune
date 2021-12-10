@@ -2,7 +2,7 @@
 This program is a game based on the T.V. show Wheel Of Fortune  which was deisgned to help promote the Mi'kmaq language to youth. The active webpage can viewed <a href=http://ugdev.cs.smu.ca/~group11/>here</a> .  
 
 ## Installation
-The program requires the following dependencies. Note that these don't have to be install directly It will be discussed how to downlaod these later in this section, however the install will make use of the npm package manger.
+The program requires the following dependencies. Note that these don't have to be install directly It will be discussed how to download these later in this section, however the install will make use of the npm package manger.
 <ol>
 <li><a href="https://www.npmjs.com/package/express">Express</a></li>
 <li><a href="https://www.npmjs.com/package/express-ws">Express-ws</a></li>
