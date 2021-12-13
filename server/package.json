@@ -4,7 +4,7 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
-    "start": "sh -c 'while [ 1 -eq 1 ]; do node ./src/index.js >> logs/log.out; done' &",
+    "start": "sh -c 'while [ 1 -eq 1 ]; do node ./src/index.js 2>&1 >> logs/log.out; done' &",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
