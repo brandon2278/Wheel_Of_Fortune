@@ -1,0 +1,15 @@
+TypeError: Cannot read properties of undefined (reading 'isLeader')
+    at removeUser (/home/groups_2021/group11/public_html/server/src/handlers/lobby.js:104:62)
+    at EventEmitter.<anonymous> (/home/groups_2021/group11/public_html/server/src/handlers/lobby.js:249:26)
+    at EventEmitter.emit (node:events:390:28)
+    at WebSocket.<anonymous> (/home/groups_2021/group11/public_html/server/src/index.js:24:19)
+    at WebSocket.emit (node:events:390:28)
+    at Receiver.receiverOnMessage (/home/groups_2021/group11/public_html/server/node_modules/ws/lib/websocket.js:983:20)
+    at Receiver.emit (node:events:390:28)
+    at Receiver.dataMessage (/home/groups_2021/group11/public_html/server/node_modules/ws/lib/receiver.js:517:14)
+    at Receiver.getData (/home/groups_2021/group11/public_html/server/node_modules/ws/lib/receiver.js:435:17)
+    at Receiver.startLoop (/home/groups_2021/group11/public_html/server/node_modules/ws/lib/receiver.js:143:22)
+Warning: got packets out of order. Expected 21 but received 0
+Warning: got packets out of order. Expected 12 but received 0
+Warning: got packets out of order. Expected 13 but received 0
+Warning: got packets out of order. Expected 13 but received 0
